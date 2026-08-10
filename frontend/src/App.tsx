@@ -10,12 +10,23 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+import CustomerList from './pages/customers/CustomerList';
+import CustomerForm from './pages/customers/CustomerForm';
+import CustomerDetail from './pages/customers/CustomerDetail';
+
 function AppRoutes() {
   const { user } = useAuth();
 
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+      
+      {/* Customer Routes */}
+      <Route path="/customers" element={<ProtectedRoute><CustomerList /></ProtectedRoute>} />
+      <Route path="/customers/new" element={<ProtectedRoute><CustomerForm /></ProtectedRoute>} />
+      <Route path="/customers/:id/edit" element={<ProtectedRoute><CustomerForm /></ProtectedRoute>} />
+      <Route path="/customers/:id" element={<ProtectedRoute><CustomerDetail /></ProtectedRoute>} />
+      
       <Route
         path="/"
         element={
@@ -25,6 +36,9 @@ function AppRoutes() {
               <p style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>
                 Phase 0 complete. Building modules next.
               </p>
+              <div style={{ marginTop: '20px' }}>
+                <a href="/customers" style={{ marginRight: '10px' }} className="btn btn-primary">Go to Customers</a>
+              </div>
             </div>
           </ProtectedRoute>
         }
