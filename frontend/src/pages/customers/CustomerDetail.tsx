@@ -1,35 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import type { FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
+import { useAuth } from '../../context/AuthContext';
+import { ArrowLeft, Edit, Trash2, Calendar, FileText, Phone, Mail, MapPin } from 'lucide-react';
 
 interface Customer {
   id: string;
   name: string;
   mobile: string;
   email: string | null;
-  customerType: string;
-  status: string;
   address: string | null;
   gstNumber: string | null;
-  followUpDate: string | null;
+  customerType: string;
+  status: string;
   notes: string | null;
+  followUpDate: string | null;
   createdAt: string;
-  updatedAt: string;
 }
 
 const CustomerDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const rolePrefix = user ? `/${user.role.toLowerCase()}` : '';
+  
+  const canEdit = user?.role === 'ADMIN' || user?.role === 'SALES';
+  
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Follow-up form
+  // Quick action states
   const [followUpDate, setFollowUpDate] = useState('');
   const [note, setNote] = useState('');
-  const [addingNote, setAddingNote] = useState(false);
-  const [noteSuccess, setNoteSuccess] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [actionSuccess, setActionSuccess] = useState('');
 
   useEffect(() => {
     fetchCustomer();
@@ -39,6 +44,8 @@ const CustomerDetail: React.FC = () => {
     try {
       const res = await api.get(`/customers/${id}`);
       setCustomer(res.data);
+      setFollowUpDate(res.data.followUpDate ? res.data.followUpDate.split('T')[0] : '');
+      setNote(res.data.notes || '');
     } catch {
       setError('Customer not found.');
     } finally {
@@ -46,176 +53,164 @@ const CustomerDetail: React.FC = () => {
     }
   };
 
-  const handleAddFollowUp = async (e: FormEvent) => {
+  const handleUpdateCRM = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!followUpDate && !note.trim()) return;
-
-    setAddingNote(true);
-    setNoteSuccess('');
+    setActionError('');
+    setActionSuccess('');
     try {
-      const res = await api.post(`/customers/${id}/followup`, {
-        followUpDate: followUpDate || undefined,
-        note: note.trim() || undefined,
+      await api.put(`/customers/${id}`, {
+        followUpDate: followUpDate || null,
+        notes: note
       });
-      setCustomer(res.data);
-      setFollowUpDate('');
-      setNote('');
-      setNoteSuccess('Follow-up added successfully!');
-      setTimeout(() => setNoteSuccess(''), 3000);
+      setActionSuccess('CRM details updated.');
+      fetchCustomer();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to add follow-up.');
-    } finally {
-      setAddingNote(false);
+      setActionError('Failed to update CRM details.');
     }
   };
 
-  const getStatusBadge = (status: string) => (
-    <span className={`badge badge-${status.toLowerCase()}`}>{status}</span>
-  );
-
-  const getTypeBadge = (type: string) => (
-    <span className={`badge badge-${type.toLowerCase()}`}>{type}</span>
-  );
-
-  // Parse notes string into individual entries
-  const parseNotes = (notesStr: string | null): { date: string; text: string }[] => {
-    if (!notesStr) return [];
-    return notesStr.split('\n').filter(Boolean).map((line) => {
-      const match = line.match(/^\[(.+?)\]\s*(.*)$/);
-      if (match) {
-        return { date: match[1], text: match[2] };
-      }
-      return { date: '', text: line };
-    });
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this customer?')) return;
+    try {
+      await api.delete(`/customers/${id}`);
+      navigate(`${rolePrefix}/customers`);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to delete customer.');
+    }
   };
 
-  if (loading) return <div className="spinner" />;
+  if (loading) return <div className="spinner-container"><div className="spinner" /></div>;
   if (error) return <div className="alert alert-error">{error}</div>;
   if (!customer) return null;
 
-  const notes = parseNotes(customer.notes);
-
   return (
     <div>
-      <div className="page-header">
-        <h1 className="page-title">{customer.name}</h1>
+      <div className="page-header" style={{ marginBottom: '16px' }}>
+        <div className="page-header-text">
+          <button className="btn-icon" onClick={() => navigate(`${rolePrefix}/customers`)} style={{ marginBottom: '8px' }}>
+            <ArrowLeft size={16} />
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="avatar-initial" style={{ width: '40px', height: '40px', fontSize: '16px', background: 'var(--primary)', color: 'white', border: 'none' }}>
+              {customer.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h1 className="page-title">{customer.name}</h1>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <span className={`badge badge-${customer.status.toLowerCase()}`}>{customer.status}</span>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{customer.customerType}</span>
+              </div>
+            </div>
+          </div>
+        </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button className="btn btn-secondary" onClick={() => navigate(`/customers/${id}/edit`)}>
-            ✏️ Edit
-          </button>
-          <button className="btn btn-secondary" onClick={() => navigate('/customers')}>
-            ← Back
-          </button>
+          {canEdit && (
+            <>
+              <button className="btn btn-secondary" onClick={() => navigate(`${rolePrefix}/customers/${customer.id}/edit`)}>
+                <Edit size={14} /> Edit
+              </button>
+              {user?.role === 'ADMIN' && (
+                <button className="btn btn-secondary" onClick={handleDelete} style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}>
+                  <Trash2 size={14} /> Delete
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 
-      <div className="detail-grid">
-        {/* Customer Info Card */}
-        <div className="card">
-          <h3 style={{ marginBottom: '20px' }}>Customer Information</h3>
+      <div className="layout-2col">
+        {/* Main Details */}
+        <div className="layout-main">
+          
+          <div className="card">
+            <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+              Contact Information
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                <Phone size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
+                <div className="detail-field">
+                  <div className="label">Mobile Number</div>
+                  <div className="value">{customer.mobile}</div>
+                </div>
+              </div>
 
-          <div className="detail-field">
-            <div className="label">Name</div>
-            <div className="value">{customer.name}</div>
-          </div>
-          <div className="detail-field">
-            <div className="label">Mobile</div>
-            <div className="value">{customer.mobile}</div>
-          </div>
-          {customer.email && (
-            <div className="detail-field">
-              <div className="label">Email</div>
-              <div className="value">{customer.email}</div>
-            </div>
-          )}
-          <div className="detail-field">
-            <div className="label">Type</div>
-            <div className="value">{getTypeBadge(customer.customerType)}</div>
-          </div>
-          <div className="detail-field">
-            <div className="label">Status</div>
-            <div className="value">{getStatusBadge(customer.status)}</div>
-          </div>
-          {customer.gstNumber && (
-            <div className="detail-field">
-              <div className="label">GST Number</div>
-              <div className="value">{customer.gstNumber}</div>
-            </div>
-          )}
-          {customer.address && (
-            <div className="detail-field">
-              <div className="label">Address</div>
-              <div className="value">{customer.address}</div>
-            </div>
-          )}
-          <div className="detail-field">
-            <div className="label">Follow-up Date</div>
-            <div className="value">
-              {customer.followUpDate
-                ? new Date(customer.followUpDate).toLocaleDateString('en-IN', {
-                    day: 'numeric', month: 'short', year: 'numeric',
-                  })
-                : '—'}
-            </div>
-          </div>
-          <div className="detail-field">
-            <div className="label">Created</div>
-            <div className="value" style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-              {new Date(customer.createdAt).toLocaleString()}
+              {customer.email && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <Mail size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
+                  <div className="detail-field">
+                    <div className="label">Email Address</div>
+                    <div className="value">{customer.email}</div>
+                  </div>
+                </div>
+              )}
+
+              {customer.gstNumber && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <FileText size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
+                  <div className="detail-field">
+                    <div className="label">GST Number</div>
+                    <div className="value">{customer.gstNumber}</div>
+                  </div>
+                </div>
+              )}
+
+              {customer.address && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', gridColumn: '1 / -1' }}>
+                  <MapPin size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
+                  <div className="detail-field">
+                    <div className="label">Billing Address</div>
+                    <div className="value" style={{ whiteSpace: 'pre-wrap' }}>{customer.address}</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Notes & Follow-up Card */}
-        <div className="card">
-          <h3 style={{ marginBottom: '20px' }}>Follow-up Notes</h3>
+        {/* Right Panel: CRM Context */}
+        <div className="layout-sidebar">
+          <div className="card">
+            <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Calendar size={16} /> CRM Details
+            </h3>
 
-          {/* Add Note Form */}
-          {noteSuccess && <div className="alert alert-success">{noteSuccess}</div>}
+            {actionError && <div className="alert alert-error" style={{ padding: '8px', fontSize: '12px', marginBottom: '12px' }}>{actionError}</div>}
+            {actionSuccess && <div className="alert alert-success" style={{ padding: '8px', fontSize: '12px', marginBottom: '12px' }}>{actionSuccess}</div>}
 
-          <form onSubmit={handleAddFollowUp} style={{ marginBottom: '24px' }}>
-            <div className="form-group">
-              <label className="form-label">Next Follow-up Date</label>
-              <input
-                type="date"
-                className="form-control"
-                value={followUpDate}
-                onChange={(e) => setFollowUpDate(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Note</label>
-              <textarea
-                className="form-control"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Add a follow-up note..."
-                rows={3}
-              />
-            </div>
-            <button type="submit" className="btn btn-primary btn-sm" disabled={addingNote}>
-              {addingNote ? 'Adding...' : '+ Add Follow-up'}
-            </button>
-          </form>
-
-          {/* Notes History */}
-          <div className="notes-section">
-            {notes.length === 0 ? (
-              <div className="empty-state" style={{ padding: '24px' }}>
-                <p>No follow-up notes yet.</p>
+            <form onSubmit={handleUpdateCRM}>
+              <div className="form-group" style={{ marginBottom: '12px' }}>
+                <label className="form-label" style={{ fontSize: '12px' }}>Follow-up Date</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  style={{ height: '32px', fontSize: '13px' }}
+                  value={followUpDate}
+                  onChange={(e) => setFollowUpDate(e.target.value)}
+                  disabled={!canEdit}
+                />
               </div>
-            ) : (
-              notes.map((n, idx) => (
-                <div key={idx} className="note-item">
-                  {n.date && (
-                    <div className="note-date">
-                      {new Date(n.date).toLocaleString()}
-                    </div>
-                  )}
-                  <div className="note-text">{n.text}</div>
-                </div>
-              ))
-            )}
+              <div className="form-group" style={{ marginBottom: '12px' }}>
+                <label className="form-label" style={{ fontSize: '12px' }}>Notes</label>
+                <textarea
+                  className="form-control"
+                  rows={4}
+                  style={{ fontSize: '13px', padding: '8px 10px' }}
+                  placeholder="Add notes about interactions..."
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  disabled={!canEdit}
+                />
+              </div>
+              
+              {canEdit && (
+                <button type="submit" className="btn btn-secondary" style={{ width: '100%', height: '32px', fontSize: '13px' }}>
+                  Update CRM Details
+                </button>
+              )}
+            </form>
           </div>
         </div>
       </div>

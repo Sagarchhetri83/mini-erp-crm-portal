@@ -1,82 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
+import { ArrowLeft, Save } from 'lucide-react';
 
 const CustomerForm: React.FC = () => {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const rolePrefix = user ? `/${user.role.toLowerCase()}` : '';
   const isEdit = Boolean(id);
 
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     mobile: '',
     email: '',
-    customerType: 'RETAIL',
-    status: 'LEAD',
     address: '',
     gstNumber: '',
-    followUpDate: '',
-    notes: '',
+    customerType: 'RETAIL',
+    status: 'LEAD',
   });
+  
+  const [loading, setLoading] = useState(isEdit);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (isEdit && id) {
-      setLoading(true);
+    if (isEdit) {
       api.get(`/customers/${id}`)
-        .then((res) => {
-          const c = res.data;
-          setForm({
-            name: c.name || '',
-            mobile: c.mobile || '',
-            email: c.email || '',
-            customerType: c.customerType || 'RETAIL',
-            status: c.status || 'LEAD',
-            address: c.address || '',
-            gstNumber: c.gstNumber || '',
-            followUpDate: c.followUpDate ? c.followUpDate.slice(0, 10) : '',
-            notes: c.notes || '',
-          });
-        })
-        .catch(() => setError('Failed to load customer.'))
+        .then(res => setFormData(res.data))
+        .catch(() => setError('Failed to load customer details'))
         .finally(() => setLoading(false));
     }
-  }, [isEdit, id]);
+  }, [id, isEdit]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     setError('');
 
-    if (!form.name.trim() || !form.mobile.trim()) {
-      setError('Name and Mobile are required.');
-      return;
-    }
-
-    setSaving(true);
     try {
-      const payload = {
-        ...form,
-        email: form.email || null,
-        address: form.address || null,
-        gstNumber: form.gstNumber || null,
-        followUpDate: form.followUpDate || null,
-        notes: form.notes || null,
-      };
-
       if (isEdit) {
-        await api.put(`/customers/${id}`, payload);
+        await api.put(`/customers/${id}`, formData);
       } else {
-        await api.post('/customers', payload);
+        await api.post('/customers', formData);
       }
-      navigate('/customers');
+      navigate(`${rolePrefix}/customers`);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to save customer.');
     } finally {
@@ -84,131 +58,126 @@ const CustomerForm: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="spinner" />;
+  if (loading) return <div className="spinner-container"><div className="spinner" /></div>;
 
   return (
     <div>
-      <div className="page-header">
-        <h1 className="page-title">{isEdit ? 'Edit Customer' : 'New Customer'}</h1>
-        <button className="btn btn-secondary" onClick={() => navigate('/customers')}>
-          ← Back to List
-        </button>
+      <div className="page-header" style={{ marginBottom: '16px' }}>
+        <div className="page-header-text">
+          <button className="btn-icon" onClick={() => navigate(`${rolePrefix}/customers`)} style={{ marginBottom: '8px' }}>
+            <ArrowLeft size={16} />
+          </button>
+          <h1 className="page-title">{isEdit ? 'Edit Customer' : 'Add New Customer'}</h1>
+        </div>
       </div>
 
-      <div className="card" style={{ maxWidth: '720px' }}>
+      <div className="card" style={{ maxWidth: '800px' }}>
         {error && <div className="alert alert-error">{error}</div>}
-
+        
         <form onSubmit={handleSubmit}>
-          <div className="form-row">
-            <div className="form-group">
+          
+          <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+            Basic Information
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Name *</label>
               <input
+                type="text"
                 name="name"
                 className="form-control"
-                value={form.name}
+                value={formData.name}
                 onChange={handleChange}
-                placeholder="Customer name"
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Mobile *</label>
+
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Mobile Number *</label>
               <input
+                type="text"
                 name="mobile"
                 className="form-control"
-                value={form.mobile}
+                value={formData.mobile}
                 onChange={handleChange}
-                placeholder="Phone number"
                 required
               />
             </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
+            
+            <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Email</label>
               <input
-                name="email"
                 type="email"
+                name="email"
                 className="form-control"
-                value={form.email}
+                value={formData.email || ''}
                 onChange={handleChange}
-                placeholder="email@example.com"
               />
             </div>
-            <div className="form-group">
+
+            <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">GST Number</label>
               <input
+                type="text"
                 name="gstNumber"
                 className="form-control"
-                value={form.gstNumber}
+                value={formData.gstNumber || ''}
                 onChange={handleChange}
-                placeholder="GSTIN"
               />
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Customer Type *</label>
-              <select name="customerType" className="form-control" value={form.customerType} onChange={handleChange}>
+          <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+            Account Settings
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Customer Type</label>
+              <select
+                name="customerType"
+                className="form-control"
+                value={formData.customerType}
+                onChange={handleChange}
+              >
                 <option value="RETAIL">Retail</option>
                 <option value="WHOLESALE">Wholesale</option>
                 <option value="DISTRIBUTOR">Distributor</option>
               </select>
             </div>
-            <div className="form-group">
+
+            <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Status</label>
-              <select name="status" className="form-control" value={form.status} onChange={handleChange}>
+              <select
+                name="status"
+                className="form-control"
+                value={formData.status}
+                onChange={handleChange}
+              >
                 <option value="LEAD">Lead</option>
                 <option value="ACTIVE">Active</option>
                 <option value="INACTIVE">Inactive</option>
               </select>
             </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Follow-up Date</label>
-              <input
-                name="followUpDate"
-                type="date"
+            
+            <div className="form-group" style={{ margin: 0, gridColumn: '1 / -1' }}>
+              <label className="form-label">Billing Address</label>
+              <textarea
+                name="address"
                 className="form-control"
-                value={form.followUpDate}
+                rows={3}
+                value={formData.address || ''}
                 onChange={handleChange}
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Address</label>
-            <textarea
-              name="address"
-              className="form-control"
-              value={form.address}
-              onChange={handleChange}
-              placeholder="Full address"
-              rows={2}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Notes</label>
-            <textarea
-              name="notes"
-              className="form-control"
-              value={form.notes}
-              onChange={handleChange}
-              placeholder="Any notes about this customer..."
-              rows={3}
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+          <div style={{ display: 'flex', gap: '12px', paddingTop: '16px', borderTop: '1px solid var(--border-color)' }}>
             <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Saving...' : isEdit ? 'Update Customer' : 'Create Customer'}
+              <Save size={14} /> {saving ? 'Saving...' : 'Save Customer'}
             </button>
-            <button type="button" className="btn btn-secondary" onClick={() => navigate('/customers')}>
+            <button type="button" className="btn btn-secondary" onClick={() => navigate(`${rolePrefix}/customers`)}>
               Cancel
             </button>
           </div>

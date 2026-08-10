@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
+import { Search, PlusCircle, MoreVertical, ChevronLeft, ChevronRight, Box } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -17,6 +18,7 @@ interface Product {
 const ProductList: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const rolePrefix = user ? `/${user.role.toLowerCase()}` : '';
   const canEdit = user?.role === 'ADMIN' || user?.role === 'WAREHOUSE';
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -61,121 +63,145 @@ const ProductList: React.FC = () => {
 
   return (
     <div>
-      <div className="page-header">
-        <h1 className="page-title">Products & Inventory</h1>
+      <div className="page-header" style={{ marginBottom: '16px' }}>
+        <div>
+          <h1 className="page-title">Products & Inventory</h1>
+        </div>
         {canEdit && (
-          <button className="btn btn-primary" onClick={() => navigate('/products/new')}>
-            + Add Product
+          <button className="btn btn-primary" onClick={() => navigate(`${rolePrefix}/products/new`)}>
+            <PlusCircle size={14} /> Add Product
           </button>
         )}
       </div>
 
-      <div className="card" style={{ marginBottom: '20px' }}>
-        <div className="search-bar">
-          <div className="search-input">
-            <input
-              type="text"
-              placeholder="Search by name or SKU..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem' }}>
-            <input
-              type="checkbox"
-              checked={lowStockFilter}
-              onChange={(e) => {
-                setLowStockFilter(e.target.checked);
-                setPage(1);
-              }}
-            />
-            Show Low Stock Only
-          </label>
+      <div className="toolbar" style={{ marginBottom: '12px' }}>
+        <div className="search-box">
+          <Search size={14} />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search by product name or SKU..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-      </div>
-
-      <div className="card">
-        {loading ? (
-          <div className="spinner" />
-        ) : products.length === 0 ? (
-          <div className="empty-state">
-            <h3>No products found</h3>
-            <p>Try adjusting your search or add a new product.</p>
-          </div>
-        ) : (
-          <>
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>SKU</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    {canEdit && <th>Actions</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((p) => {
-                    const isLowStock = p.stock <= p.minStock;
-                    return (
-                      <tr key={p.id} className={isLowStock ? 'low-stock' : ''}>
-                        <td>
-                          <Link to={`/products/${p.id}`} style={{ fontWeight: 600 }}>
-                            {p.name}
-                          </Link>
-                          {isLowStock && (
-                            <div style={{ fontSize: '0.75rem', color: '#b45309', fontWeight: 600, marginTop: '2px' }}>
-                              ⚠️ Low Stock (Min: {p.minStock})
-                            </div>
-                          )}
-                        </td>
-                        <td>{p.sku}</td>
-                        <td>{p.category || '—'}</td>
-                        <td>₹{p.price.toFixed(2)}</td>
-                        <td>
-                          <span style={{ fontWeight: 600, color: isLowStock ? '#b45309' : 'inherit' }}>
-                            {p.stock}
-                          </span>{' '}
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{p.unit}</span>
-                        </td>
-                        {canEdit && (
-                          <td>
-                            <button
-                              className="btn btn-secondary btn-sm"
-                              onClick={() => navigate(`/products/${p.id}/edit`)}
-                            >
-                              Edit
-                            </button>
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
-              <span className="pagination-info">
-                Showing {products.length} of {total} products
-              </span>
-              <div className="pagination">
-                <button disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                  ← Prev
-                </button>
-                <span style={{ padding: '8px 12px', fontSize: '0.875rem' }}>
-                  Page {page} of {totalPages}
-                </span>
-                <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-                  Next →
-                </button>
-              </div>
-            </div>
-          </>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13px', padding: '0 12px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', height: '36px' }}>
+          <input
+            type="checkbox"
+            checked={lowStockFilter}
+            onChange={(e) => {
+              setLowStockFilter(e.target.checked);
+              setPage(1);
+            }}
+          />
+          Low Stock Only
+        </label>
+        {search && (
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => { setSearch(''); }}
+            style={{ fontSize: '13px' }}
+          >
+            Clear
+          </button>
         )}
       </div>
+
+      {loading ? (
+        <div className="spinner-container"><div className="spinner" /></div>
+      ) : products.length === 0 ? (
+        <div className="card" style={{ padding: '40px' }}>
+          <div className="empty-state">
+            <p>No products found. Adjust your search or add a new product.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>PRODUCT</th>
+                <th>CATEGORY</th>
+                <th>PRICE</th>
+                <th>STOCK STATUS</th>
+                <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => {
+                const isLowStock = p.stock <= p.minStock && p.stock > 0;
+                const isOutOfStock = p.stock === 0;
+                let statusClass = 'status-in-stock';
+                let statusText = 'In Stock';
+
+                if (isOutOfStock) {
+                  statusClass = 'status-out-of-stock';
+                  statusText = 'Out of Stock';
+                } else if (isLowStock) {
+                  statusClass = 'status-low-stock';
+                  statusText = 'Low Stock';
+                }
+
+                return (
+                  <tr key={p.id}>
+                    <td>
+                      <div className="table-avatar-cell">
+                        <div className="avatar-initial" style={{ background: 'transparent' }}>
+                          <Box size={16} style={{ color: 'var(--text-muted)' }} />
+                        </div>
+                        <div>
+                          <Link to={`${rolePrefix}/products/${p.id}`} className="cell-title" style={{ fontFamily: 'monospace' }}>
+                            {p.name}
+                          </Link>
+                          <div className="cell-subtitle">{p.sku}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{p.category || '—'}</td>
+                    <td>₹{p.price.toFixed(2)}</td>
+                    <td>
+                      <div className={`status-dot ${statusClass}`}>
+                        {statusText}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        {p.stock} {p.unit} available
+                      </div>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                          className="btn-icon"
+                          title="View Details"
+                          onClick={() => navigate(`${rolePrefix}/products/${p.id}`)}
+                        >
+                          <MoreVertical size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          <div className="pagination-wrapper">
+            <span className="pagination-info">
+              Showing {products.length} of {total} products
+            </span>
+            <div className="pagination-controls">
+              <button className="btn btn-secondary btn-icon" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+                <ChevronLeft size={14} />
+              </button>
+              <span className="page-info">
+                Page {page} of {totalPages}
+              </span>
+              <button className="btn btn-secondary btn-icon" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

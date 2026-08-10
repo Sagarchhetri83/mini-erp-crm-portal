@@ -1,86 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
+import { ArrowLeft, Save } from 'lucide-react';
 
 const ProductForm: React.FC = () => {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const rolePrefix = user ? `/${user.role.toLowerCase()}` : '';
   const isEdit = Boolean(id);
 
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    sku: '',
+    description: '',
+    price: 0,
+    stock: 0,
+    minStock: 0,
+    unit: 'pcs',
+    category: '',
+  });
+
+  const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const [form, setForm] = useState({
-    name: '',
-    sku: '',
-    price: '',
-    unit: 'PCS',
-    stock: '0', // Initial stock only on create
-    minStock: '0',
-    category: '',
-    location: '',
-    description: '',
-  });
-
   useEffect(() => {
-    if (isEdit && id) {
-      setLoading(true);
+    if (isEdit) {
       api.get(`/products/${id}`)
-        .then((res) => {
-          const p = res.data;
-          setForm({
-            name: p.name || '',
-            sku: p.sku || '',
-            price: p.price?.toString() || '',
-            unit: p.unit || 'PCS',
-            stock: p.stock?.toString() || '0', // Ignored on update
-            minStock: p.minStock?.toString() || '0',
-            category: p.category || '',
-            location: p.location || '',
-            description: p.description || '',
-          });
-        })
-        .catch(() => setError('Failed to load product.'))
+        .then(res => setFormData(res.data))
+        .catch(() => setError('Failed to load product details'))
         .finally(() => setLoading(false));
     }
-  }, [isEdit, id]);
+  }, [id, isEdit]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    let finalValue: string | number = value;
+    
+    if (type === 'number') {
+      finalValue = parseFloat(value) || 0;
+    }
+    setFormData(prev => ({ ...prev, [name]: finalValue }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     setError('');
 
-    if (!form.name.trim() || !form.sku.trim() || !form.price.trim()) {
-      setError('Name, SKU, and Price are required.');
-      return;
-    }
-
-    setSaving(true);
     try {
-      const payload: any = {
-        name: form.name,
-        sku: form.sku,
-        price: parseFloat(form.price),
-        unit: form.unit,
-        minStock: parseInt(form.minStock) || 0,
-        category: form.category || null,
-        location: form.location || null,
-        description: form.description || null,
-      };
-
       if (isEdit) {
-        // Stock cannot be updated via PUT, handled via adjust-stock endpoint
-        await api.put(`/products/${id}`, payload);
+        await api.put(`/products/${id}`, formData);
       } else {
-        payload.stock = parseInt(form.stock) || 0;
-        await api.post('/products', payload);
+        await api.post('/products', formData);
       }
-      navigate('/products');
+      navigate(`${rolePrefix}/products`);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to save product.');
     } finally {
@@ -88,142 +65,140 @@ const ProductForm: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="spinner" />;
+  if (loading) return <div className="spinner-container"><div className="spinner" /></div>;
 
   return (
     <div>
-      <div className="page-header">
-        <h1 className="page-title">{isEdit ? 'Edit Product' : 'New Product'}</h1>
-        <button className="btn btn-secondary" onClick={() => navigate('/products')}>
-          ← Back to List
-        </button>
+      <div className="page-header" style={{ marginBottom: '16px' }}>
+        <div className="page-header-text">
+          <button className="btn-icon" onClick={() => navigate(`${rolePrefix}/products`)} style={{ marginBottom: '8px' }}>
+            <ArrowLeft size={16} />
+          </button>
+          <h1 className="page-title">{isEdit ? 'Edit Product' : 'Add New Product'}</h1>
+        </div>
       </div>
 
-      <div className="card" style={{ maxWidth: '720px' }}>
+      <div className="card" style={{ maxWidth: '800px' }}>
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-row">
-            <div className="form-group">
+          
+          <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+            Basic Details
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Product Name *</label>
               <input
+                type="text"
                 name="name"
                 className="form-control"
-                value={form.name}
+                value={formData.name}
                 onChange={handleChange}
-                placeholder="Item name"
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">SKU / Code *</label>
+            
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">SKU *</label>
               <input
+                type="text"
                 name="sku"
                 className="form-control"
-                value={form.sku}
-                onChange={handleChange}
-                placeholder="Unique code"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Price (₹) *</label>
-              <input
-                name="price"
-                type="number"
-                step="0.01"
-                min="0"
-                className="form-control"
-                value={form.price}
+                value={formData.sku}
                 onChange={handleChange}
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Unit</label>
-              <input
-                name="unit"
-                className="form-control"
-                value={form.unit}
-                onChange={handleChange}
-                placeholder="e.g., PCS, KG, BOX"
-              />
-            </div>
-          </div>
-
-          {!isEdit && (
-            <div className="form-group">
-              <label className="form-label">Initial Stock</label>
-              <input
-                name="stock"
-                type="number"
-                min="0"
-                className="form-control"
-                value={form.stock}
-                onChange={handleChange}
-                style={{ maxWidth: '240px' }}
-              />
-              <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                Stock can only be modified later via adjustments.
-              </div>
-            </div>
-          )}
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Min Stock Alert Level</label>
-              <input
-                name="minStock"
-                type="number"
-                min="0"
-                className="form-control"
-                value={form.minStock}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
+            
+            <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Category</label>
               <input
+                type="text"
                 name="category"
                 className="form-control"
-                value={form.category}
+                value={formData.category || ''}
                 onChange={handleChange}
-                placeholder="e.g., Electronics, Hardware"
+                placeholder="e.g. Electronics, Clothing"
+              />
+            </div>
+            
+            <div className="form-group" style={{ margin: 0, gridColumn: '1 / -1' }}>
+              <label className="form-label">Description</label>
+              <textarea
+                name="description"
+                className="form-control"
+                rows={3}
+                value={formData.description || ''}
+                onChange={handleChange}
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Location / Warehouse Bin</label>
-            <input
-              name="location"
-              className="form-control"
-              value={form.location}
-              onChange={handleChange}
-              placeholder="e.g., A1-Shelf-2"
-              style={{ maxWidth: '300px' }}
-            />
+          <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+            Pricing & Inventory
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Price (₹) *</label>
+              <input
+                type="number"
+                name="price"
+                min="0"
+                step="0.01"
+                className="form-control"
+                value={formData.price}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Unit</label>
+              <input
+                type="text"
+                name="unit"
+                className="form-control"
+                value={formData.unit}
+                onChange={handleChange}
+                placeholder="pcs, kg, box"
+              />
+            </div>
+
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Current Stock *</label>
+              <input
+                type="number"
+                name="stock"
+                min="0"
+                className="form-control"
+                value={formData.stock}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Minimum Stock Alert *</label>
+              <input
+                type="number"
+                name="minStock"
+                min="0"
+                className="form-control"
+                value={formData.minStock}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Description</label>
-            <textarea
-              name="description"
-              className="form-control"
-              value={form.description}
-              onChange={handleChange}
-              rows={3}
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+          <div style={{ display: 'flex', gap: '12px', paddingTop: '16px', borderTop: '1px solid var(--border-color)' }}>
             <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Saving...' : isEdit ? 'Update Product' : 'Create Product'}
+              <Save size={14} /> {saving ? 'Saving...' : 'Save Product'}
             </button>
-            <button type="button" className="btn btn-secondary" onClick={() => navigate('/products')}>
+            <button type="button" className="btn btn-secondary" onClick={() => navigate(`${rolePrefix}/products`)}>
               Cancel
             </button>
           </div>

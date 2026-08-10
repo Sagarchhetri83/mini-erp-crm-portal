@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
+import { Search, PlusCircle, ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react';
 
 interface Challan {
   id: string;
@@ -21,6 +22,7 @@ interface Challan {
 const ChallanList: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const rolePrefix = user ? `/${user.role.toLowerCase()}` : '';
   const canCreate = user?.role === 'ADMIN' || user?.role === 'SALES';
 
   const [challans, setChallans] = useState<Challan[]>([]);
@@ -64,111 +66,127 @@ const ChallanList: React.FC = () => {
   }, [search]);
 
   const getStatusBadge = (status: string) => {
-    let type = 'secondary';
-    if (status === 'CONFIRMED') type = 'success';
-    if (status === 'CANCELLED') type = 'error';
-    if (status === 'DRAFT') type = 'warning';
-    return <span className={`badge badge-${type}`}>{status}</span>;
+    return <span className={`badge badge-${status.toLowerCase()}`}>{status}</span>;
   };
 
   return (
     <div>
-      <div className="page-header">
-        <h1 className="page-title">Sales Challans</h1>
+      <div className="page-header" style={{ marginBottom: '16px' }}>
+        <div>
+          <h1 className="page-title">Sales Challans</h1>
+        </div>
         {canCreate && (
-          <button className="btn btn-primary" onClick={() => navigate('/challans/new')}>
-            + New Challan
+          <button className="btn btn-primary" onClick={() => navigate(`${rolePrefix}/challans/new`)}>
+            <PlusCircle size={14} /> New Challan
           </button>
         )}
       </div>
 
-      <div className="card" style={{ marginBottom: '20px' }}>
-        <div className="search-bar">
-          <div className="search-input">
-            <input
-              type="text"
-              placeholder="Search by Challan No or Customer Name..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <select
+      <div className="toolbar" style={{ marginBottom: '12px' }}>
+        <div className="search-box">
+          <Search size={14} />
+          <input
+            type="text"
             className="form-control"
-            style={{ width: 'auto', minWidth: '150px' }}
-            value={statusFilter}
-            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          >
-            <option value="">All Status</option>
-            <option value="DRAFT">Draft</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
+            placeholder="Search by Challan No or Customer..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
-      </div>
-
-      <div className="card">
-        {loading ? (
-          <div className="spinner" />
-        ) : challans.length === 0 ? (
-          <div className="empty-state">
-            <h3>No challans found</h3>
-            <p>Try adjusting your search or create a new challan.</p>
-          </div>
-        ) : (
-          <>
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Challan No</th>
-                    <th>Date</th>
-                    <th>Customer</th>
-                    <th>Created By</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {challans.map((c) => (
-                    <tr key={c.id}>
-                      <td>
-                        <Link to={`/challans/${c.id}`} style={{ fontWeight: 600, fontFamily: 'monospace' }}>
-                          {c.challanNo}
-                        </Link>
-                      </td>
-                      <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        <div style={{ fontWeight: 500 }}>{c.customer.name}</div>
-                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{c.customer.mobile}</div>
-                      </td>
-                      <td>{c.createdBy.name}</td>
-                      <td style={{ fontWeight: 600 }}>₹{c.totalAmount.toFixed(2)}</td>
-                      <td>{getStatusBadge(c.status)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
-              <span className="pagination-info">
-                Showing {challans.length} of {total} challans
-              </span>
-              <div className="pagination">
-                <button disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                  ← Prev
-                </button>
-                <span style={{ padding: '8px 12px', fontSize: '0.875rem' }}>
-                  Page {page} of {totalPages}
-                </span>
-                <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-                  Next →
-                </button>
-              </div>
-            </div>
-          </>
+        <select
+          className="form-control"
+          style={{ width: 'auto', minWidth: '150px' }}
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+        >
+          <option value="">All Status</option>
+          <option value="DRAFT">Draft</option>
+          <option value="CONFIRMED">Confirmed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+        {(search || statusFilter) && (
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => { setSearch(''); setStatusFilter(''); }}
+            style={{ fontSize: '13px' }}
+          >
+            Clear
+          </button>
         )}
       </div>
+
+      {loading ? (
+        <div className="spinner-container"><div className="spinner" /></div>
+      ) : challans.length === 0 ? (
+        <div className="card" style={{ padding: '40px' }}>
+          <div className="empty-state">
+            <p>No challans found. Adjust your search or create a new challan.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>CHALLAN</th>
+                <th>CUSTOMER</th>
+                <th>DATE</th>
+                <th>AMOUNT</th>
+                <th>CREATED BY</th>
+                <th>STATUS</th>
+                <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {challans.map((c) => (
+                <tr key={c.id}>
+                  <td>
+                    <Link to={`${rolePrefix}/challans/${c.id}`} style={{ fontWeight: 500, fontFamily: 'monospace' }}>
+                      {c.challanNo}
+                    </Link>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 500 }}>{c.customer.name}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{c.customer.mobile}</div>
+                  </td>
+                  <td>{new Date(c.createdAt).toLocaleDateString()}</td>
+                  <td style={{ fontWeight: 500 }}>₹{c.totalAmount.toFixed(2)}</td>
+                  <td style={{ color: 'var(--text-secondary)' }}>{c.createdBy.name}</td>
+                  <td>{getStatusBadge(c.status)}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <button
+                        className="btn-icon"
+                        title="View Details"
+                        onClick={() => navigate(`${rolePrefix}/challans/${c.id}`)}
+                      >
+                        <MoreVertical size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="pagination-wrapper">
+            <span className="pagination-info">
+              Showing {challans.length} of {total} challans
+            </span>
+            <div className="pagination-controls">
+              <button className="btn btn-secondary btn-icon" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+                <ChevronLeft size={14} />
+              </button>
+              <span className="page-info">
+                Page {page} of {totalPages}
+              </span>
+              <button className="btn btn-secondary btn-icon" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
