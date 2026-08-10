@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { requireAuth } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 const prisma = new PrismaClient();
 
 /**

@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { PrismaClient, CustomerType, CustomerStatus } from '@prisma/client';
 import { requireAuth } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 const prisma = new PrismaClient();
 
 // All routes require authentication
@@ -113,8 +113,9 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
+    const id = req.params.id as string;
     const customer = await prisma.customer.findUnique({
-      where: { id: req.params.id },
+      where: { id },
     });
 
     if (!customer) {
@@ -134,7 +135,8 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
  */
 router.put('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
-    const existing = await prisma.customer.findUnique({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    const existing = await prisma.customer.findUnique({ where: { id } });
     if (!existing) {
       res.status(404).json({ error: 'Customer not found.' });
       return;
@@ -174,7 +176,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
     if (notes !== undefined) updateData.notes = notes || null;
 
     const customer = await prisma.customer.update({
-      where: { id: req.params.id },
+      where: { id },
       data: updateData,
     });
 
@@ -191,7 +193,8 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
  */
 router.post('/:id/followup', async (req: Request, res: Response): Promise<void> => {
   try {
-    const existing = await prisma.customer.findUnique({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    const existing = await prisma.customer.findUnique({ where: { id } });
     if (!existing) {
       res.status(404).json({ error: 'Customer not found.' });
       return;
@@ -221,7 +224,7 @@ router.post('/:id/followup', async (req: Request, res: Response): Promise<void> 
     }
 
     const customer = await prisma.customer.update({
-      where: { id: req.params.id },
+      where: { id },
       data: updateData,
     });
 

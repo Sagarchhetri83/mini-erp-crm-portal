@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { PrismaClient, StockMovementType } from '@prisma/client';
 import { requireAuth, requireRole } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 const prisma = new PrismaClient();
 
 router.use(requireAuth);
@@ -127,8 +127,9 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
+    const id = req.params.id as string;
     const product = await prisma.product.findUnique({
-      where: { id: req.params.id },
+      where: { id },
     });
 
     if (!product) {
@@ -148,7 +149,8 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
  */
 router.put('/:id', requireRole('ADMIN', 'WAREHOUSE'), async (req: Request, res: Response): Promise<void> => {
   try {
-    const existing = await prisma.product.findUnique({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    const existing = await prisma.product.findUnique({ where: { id } });
     if (!existing) {
       res.status(404).json({ error: 'Product not found.' });
       return;
@@ -175,7 +177,7 @@ router.put('/:id', requireRole('ADMIN', 'WAREHOUSE'), async (req: Request, res: 
     if (description !== undefined) updateData.description = description || null;
 
     const product = await prisma.product.update({
-      where: { id: req.params.id },
+      where: { id },
       data: updateData,
     });
 
@@ -191,8 +193,9 @@ router.put('/:id', requireRole('ADMIN', 'WAREHOUSE'), async (req: Request, res: 
  */
 router.get('/:id/movements', async (req: Request, res: Response): Promise<void> => {
   try {
+    const productId = req.params.id as string;
     const movements = await prisma.stockMovement.findMany({
-      where: { productId: req.params.id },
+      where: { productId },
       orderBy: { createdAt: 'desc' },
       include: {
         createdBy: { select: { name: true, role: true } },
@@ -219,7 +222,8 @@ router.post('/:id/adjust-stock', requireRole('ADMIN', 'WAREHOUSE'), async (req: 
       return;
     }
 
-    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    const product = await prisma.product.findUnique({ where: { id } });
     if (!product) {
       res.status(404).json({ error: 'Product not found.' });
       return;
@@ -234,7 +238,7 @@ router.post('/:id/adjust-stock', requireRole('ADMIN', 'WAREHOUSE'), async (req: 
       const stockChange = type === 'IN' ? parsedQty : -parsedQty;
       
       const p = await tx.product.update({
-        where: { id: req.params.id },
+        where: { id },
         data: { stock: { increment: stockChange } },
       });
 

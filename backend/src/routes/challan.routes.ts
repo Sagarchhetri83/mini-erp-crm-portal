@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { PrismaClient, ChallanStatus, StockMovementType } from '@prisma/client';
 import { requireAuth, requireRole } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 const prisma = new PrismaClient();
 
 router.use(requireAuth);
@@ -150,8 +150,9 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
+    const id = req.params.id as string;
     const challan = await prisma.challan.findUnique({
-      where: { id: req.params.id },
+      where: { id },
       include: {
         items: true,
         customer: true,
@@ -176,8 +177,9 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
  */
 router.post('/:id/confirm', requireRole('ADMIN', 'SALES', 'WAREHOUSE'), async (req: Request, res: Response): Promise<void> => {
   try {
+    const id = req.params.id as string;
     const challan = await prisma.challan.findUnique({
-      where: { id: req.params.id },
+      where: { id },
       include: { items: true },
     });
 
@@ -245,7 +247,8 @@ router.post('/:id/confirm', requireRole('ADMIN', 'SALES', 'WAREHOUSE'), async (r
  */
 router.delete('/:id', requireRole('ADMIN', 'SALES'), async (req: Request, res: Response): Promise<void> => {
   try {
-    const challan = await prisma.challan.findUnique({ where: { id: req.params.id } });
+    const id = req.params.id as string;
+    const challan = await prisma.challan.findUnique({ where: { id } });
     if (!challan) {
       res.status(404).json({ error: 'Challan not found.' });
       return;

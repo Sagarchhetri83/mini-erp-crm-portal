@@ -6,7 +6,7 @@ import productRoutes from './routes/product.routes';
 import challanRoutes from './routes/challan.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 
-const app = express();
+const app: express.Express = express();
 const PORT = process.env.PORT || 5000;
 
 // ── Middleware ──────────────────────────────────────────
