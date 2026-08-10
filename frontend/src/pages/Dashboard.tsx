@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
-import { useAuth } from '../context/AuthContext';
+import { 
+  PlusCircle
+} from 'lucide-react';
 
 interface DashboardData {
   metrics: {
@@ -28,7 +30,6 @@ interface DashboardData {
 }
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -40,128 +41,159 @@ const Dashboard: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="spinner" />;
+  if (loading) return <div className="spinner-container"><div className="spinner" /></div>;
   if (error) return <div className="alert alert-error">{error}</div>;
   if (!data) return null;
 
   return (
     <div>
-      <div className="page-header">
-        <h1 className="page-title">Welcome back, {user?.name.split(' ')[0]} 👋</h1>
+      <div className="page-header" style={{ marginBottom: '16px' }}>
+        <div>
+          <h1 className="page-title" style={{ fontSize: '18px' }}>Dashboard</h1>
+          <p className="page-subtitle">Overview of your business operations</p>
+        </div>
       </div>
 
-      <div className="dashboard-metrics" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
-        <div className="card" style={{ padding: '24px', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '8px' }}>
-            {data.metrics.totalCustomers}
+      <div className="kpi-strip">
+        <div className="card kpi-card">
+          <div className="kpi-header">
+            <span className="kpi-label">Customers</span>
           </div>
-          <div style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Total Customers</div>
+          <div className="kpi-value">{data.metrics.totalCustomers}</div>
         </div>
         
-        <div className="card" style={{ padding: '24px', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '8px' }}>
-            {data.metrics.totalProducts}
+        <div className="card kpi-card">
+          <div className="kpi-header">
+            <span className="kpi-label">Products</span>
           </div>
-          <div style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Total Products</div>
+          <div className="kpi-value">{data.metrics.totalProducts}</div>
         </div>
 
-        <div className="card" style={{ padding: '24px', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '8px' }}>
-            {data.metrics.totalChallans}
+        <div className="card kpi-card">
+          <div className="kpi-header">
+            <span className="kpi-label">Challans</span>
           </div>
-          <div style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Total Challans</div>
+          <div className="kpi-value">{data.metrics.totalChallans}</div>
         </div>
 
-        <div className="card" style={{ padding: '24px', textAlign: 'center', backgroundColor: data.metrics.lowStockCount > 0 ? '#fef2f2' : 'var(--card-bg)' }}>
-          <div style={{ fontSize: '2rem', fontWeight: 700, color: data.metrics.lowStockCount > 0 ? '#b45309' : 'var(--primary)', marginBottom: '8px' }}>
+        <div className="card kpi-card" style={{ borderColor: data.metrics.lowStockCount > 0 ? 'var(--warning)' : 'var(--border-color)', backgroundColor: data.metrics.lowStockCount > 0 ? 'var(--warning-bg)' : 'var(--bg-surface)' }}>
+          <div className="kpi-header">
+            <span className="kpi-label" style={{ color: data.metrics.lowStockCount > 0 ? '#92400E' : 'var(--text-secondary)' }}>Low Stock</span>
+          </div>
+          <div className="kpi-value" style={{ color: data.metrics.lowStockCount > 0 ? '#92400E' : 'inherit' }}>
             {data.metrics.lowStockCount}
-          </div>
-          <div style={{ color: data.metrics.lowStockCount > 0 ? '#b45309' : 'var(--text-secondary)', fontWeight: 500 }}>
-            Low Stock Alerts
           </div>
         </div>
       </div>
 
-      <div className="detail-grid">
-        {/* Low Stock Alerts */}
-        <div className="card">
-          <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            Low Stock Items
-            <Link to="/products?lowStock=true" style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--primary)' }}>View All →</Link>
-          </h3>
-          
-          {data.lowStockProducts.length === 0 ? (
-            <div className="empty-state" style={{ padding: '20px' }}>
-              <p>Inventory is healthy.</p>
+      <div className="layout-2col">
+        {/* MAIN COLUMN */}
+        <div className="layout-main">
+          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '14px' }}>Recent Sales Challans</h3>
             </div>
-          ) : (
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Stock</th>
-                    <th>Min</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.lowStockProducts.map(p => (
-                    <tr key={p.id}>
-                      <td>
-                        <Link to={`/products/${p.id}`} style={{ fontWeight: 500 }}>{p.name}</Link>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{p.sku}</div>
-                      </td>
-                      <td style={{ color: '#b45309', fontWeight: 600 }}>{p.stock}</td>
-                      <td>{p.minStock}</td>
+            {data.recentChallans.length === 0 ? (
+              <div className="empty-state" style={{ padding: '24px' }}>
+                <p>No challans created yet.</p>
+              </div>
+            ) : (
+              <div className="table-wrapper" style={{ border: 'none', borderRadius: 0 }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Challan</th>
+                      <th>Customer</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody>
+                    {data.recentChallans.map(c => (
+                      <tr key={c.id}>
+                        <td>
+                          <Link to={`/challans/${c.id}`} style={{ fontWeight: 500 }}>
+                            {c.challanNo}
+                          </Link>
+                        </td>
+                        <td>{c.customer.name}</td>
+                        <td style={{ color: 'var(--text-secondary)' }}>{new Date(c.createdAt).toLocaleDateString()}</td>
+                        <td>₹{c.totalAmount.toFixed(2)}</td>
+                        <td>
+                          <span className={`badge badge-${c.status.toLowerCase()}`}>
+                            {c.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+          
+          {/* Example of another main area block could go here, e.g. Recent Customers */}
         </div>
 
-        {/* Recent Challans */}
-        <div className="card">
-          <h3 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            Recent Challans
-            <Link to="/challans" style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--primary)' }}>View All →</Link>
-          </h3>
+        {/* RIGHT COLUMN */}
+        <div className="layout-sidebar">
+          
+          <div className="card">
+            <h3 style={{ fontSize: '14px', marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid var(--border-color)' }}>
+              Inventory Status
+            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Products</span>
+              <span style={{ fontSize: '13px', fontWeight: 500 }}>{data.metrics.totalProducts}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Low Stock</span>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: data.metrics.lowStockCount > 0 ? 'var(--danger)' : 'var(--text-primary)' }}>{data.metrics.lowStockCount}</span>
+            </div>
+            
+            <div style={{ marginTop: '12px', fontSize: '13px', color: data.metrics.lowStockCount > 0 ? 'var(--warning)' : 'var(--success)' }}>
+              {data.metrics.lowStockCount > 0 ? 'Attention required for inventory.' : 'Inventory is healthy.'}
+            </div>
+          </div>
 
-          {data.recentChallans.length === 0 ? (
-            <div className="empty-state" style={{ padding: '20px' }}>
-              <p>No challans created yet.</p>
+          <div className="card">
+            <h3 style={{ fontSize: '14px', marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid var(--border-color)' }}>
+              Quick Actions
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <Link to="/challans/new" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'transparent', padding: '6px 0', height: 'auto', fontWeight: 400, color: 'var(--text-primary)' }}>
+                <PlusCircle size={14} style={{ color: 'var(--text-muted)' }} /> New Challan
+              </Link>
+              <Link to="/customers/new" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'transparent', padding: '6px 0', height: 'auto', fontWeight: 400, color: 'var(--text-primary)' }}>
+                <PlusCircle size={14} style={{ color: 'var(--text-muted)' }} /> Add Customer
+              </Link>
+              <Link to="/products/new" className="btn btn-secondary" style={{ justifyContent: 'flex-start', border: 'none', background: 'transparent', padding: '6px 0', height: 'auto', fontWeight: 400, color: 'var(--text-primary)' }}>
+                <PlusCircle size={14} style={{ color: 'var(--text-muted)' }} /> Add Product
+              </Link>
             </div>
-          ) : (
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Challan No</th>
-                    <th>Customer</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.recentChallans.map(c => (
-                    <tr key={c.id}>
-                      <td>
-                        <Link to={`/challans/${c.id}`} style={{ fontWeight: 500, fontFamily: 'monospace' }}>
-                          {c.challanNo}
-                        </Link>
-                      </td>
-                      <td>{c.customer.name}</td>
-                      <td>
-                        <span className={`badge badge-${c.status === 'CONFIRMED' ? 'success' : c.status === 'CANCELLED' ? 'error' : 'warning'}`}>
-                          {c.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          </div>
+
+          <div className="card">
+            <h3 style={{ fontSize: '14px', marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid var(--border-color)' }}>
+              Recent Activity
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {data.recentChallans.slice(0, 3).map(c => (
+                <div key={c.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px' }}>
+                  <div style={{ color: 'var(--primary)', marginTop: '2px' }}>●</div>
+                  <div>
+                    Challan <span style={{ fontWeight: 500 }}>{c.challanNo}</span> {c.status.toLowerCase()}
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{new Date(c.createdAt).toLocaleDateString()}</div>
+                  </div>
+                </div>
+              ))}
+              {data.recentChallans.length === 0 && (
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No recent activity.</div>
+              )}
             </div>
-          )}
+          </div>
+
         </div>
       </div>
     </div>
