@@ -14,6 +14,10 @@ import CustomerList from './pages/customers/CustomerList';
 import CustomerForm from './pages/customers/CustomerForm';
 import CustomerDetail from './pages/customers/CustomerDetail';
 
+import ProductList from './pages/products/ProductList';
+import ProductForm from './pages/products/ProductForm';
+import ProductDetail from './pages/products/ProductDetail';
+
 function AppRoutes() {
   const { user } = useAuth();
 
@@ -27,6 +31,12 @@ function AppRoutes() {
       <Route path="/customers/:id/edit" element={<ProtectedRoute><CustomerForm /></ProtectedRoute>} />
       <Route path="/customers/:id" element={<ProtectedRoute><CustomerDetail /></ProtectedRoute>} />
       
+      {/* Product Routes */}
+      <Route path="/products" element={<ProtectedRoute><ProductList /></ProtectedRoute>} />
+      <Route path="/products/new" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
+      <Route path="/products/:id/edit" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
+      <Route path="/products/:id" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
+      
       <Route
         path="/"
         element={
@@ -38,6 +48,7 @@ function AppRoutes() {
               </p>
               <div style={{ marginTop: '20px' }}>
                 <a href="/customers" style={{ marginRight: '10px' }} className="btn btn-primary">Go to Customers</a>
+                <a href="/products" className="btn btn-primary">Go to Products</a>
               </div>
             </div>
           </ProtectedRoute>
