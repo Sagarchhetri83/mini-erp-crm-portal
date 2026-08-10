@@ -17,12 +17,14 @@ const CustomerForm: React.FC = () => {
     mobile: '',
     businessName: '',
     email: '',
-    address: '',
     gstNumber: '',
     customerType: 'RETAIL',
     status: 'LEAD',
+    followUpDate: '',
+    notes: '',
+    address: '',
   });
-  
+
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -30,8 +32,22 @@ const CustomerForm: React.FC = () => {
   useEffect(() => {
     if (isEdit) {
       api.get(`/customers/${id}`)
-        .then(res => setFormData(res.data))
-        .catch(() => setError('Failed to load customer details'))
+        .then(res => {
+          const d = res.data;
+          setFormData({
+            name: d.name || '',
+            mobile: d.mobile || '',
+            businessName: d.businessName || '',
+            email: d.email || '',
+            gstNumber: d.gstNumber || '',
+            customerType: d.customerType || 'RETAIL',
+            status: d.status || 'LEAD',
+            followUpDate: d.followUpDate ? d.followUpDate.split('T')[0] : '',
+            notes: d.notes || '',
+            address: d.address || '',
+          });
+        })
+        .catch(() => setError('Failed to load customer details.'))
         .finally(() => setLoading(false));
     }
   }, [id, isEdit]);
@@ -45,11 +61,21 @@ const CustomerForm: React.FC = () => {
     setSaving(true);
     setError('');
 
+    const payload = {
+      ...formData,
+      followUpDate: formData.followUpDate || null,
+      businessName: formData.businessName || null,
+      email: formData.email || null,
+      gstNumber: formData.gstNumber || null,
+      notes: formData.notes || null,
+      address: formData.address || null,
+    };
+
     try {
       if (isEdit) {
-        await api.put(`/customers/${id}`, formData);
+        await api.put(`/customers/${id}`, payload);
       } else {
-        await api.post('/customers', formData);
+        await api.post('/customers', payload);
       }
       navigate(`${rolePrefix}/customers`);
     } catch (err: any) {
@@ -72,13 +98,14 @@ const CustomerForm: React.FC = () => {
         </div>
       </div>
 
-      <div className="card" style={{ maxWidth: '800px' }}>
+      <div className="card" style={{ maxWidth: '860px' }}>
         {error && <div className="alert alert-error">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
-          
-          <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
-            Basic Information
+
+          {/* ── Customer Information ── */}
+          <h3 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+            Customer Information
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
@@ -90,6 +117,7 @@ const CustomerForm: React.FC = () => {
                 className="form-control"
                 value={formData.name}
                 onChange={handleChange}
+                placeholder="Full name"
                 required
               />
             </div>
@@ -102,18 +130,8 @@ const CustomerForm: React.FC = () => {
                 className="form-control"
                 value={formData.mobile}
                 onChange={handleChange}
+                placeholder="e.g. 9876543210"
                 required
-              />
-            </div>
-            
-            <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label">Business Name</label>
-              <input
-                type="text"
-                name="businessName"
-                className="form-control"
-                value={formData.businessName || ''}
-                onChange={handleChange}
               />
             </div>
 
@@ -123,25 +141,40 @@ const CustomerForm: React.FC = () => {
                 type="email"
                 name="email"
                 className="form-control"
-                value={formData.email || ''}
+                value={formData.email}
                 onChange={handleChange}
+                placeholder="email@example.com"
               />
             </div>
 
             <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label">GST Number</label>
+              <label className="form-label">Business Name</label>
+              <input
+                type="text"
+                name="businessName"
+                className="form-control"
+                value={formData.businessName}
+                onChange={handleChange}
+                placeholder="Company or trade name"
+              />
+            </div>
+
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">GST Number <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span></label>
               <input
                 type="text"
                 name="gstNumber"
                 className="form-control"
-                value={formData.gstNumber || ''}
+                value={formData.gstNumber}
                 onChange={handleChange}
+                placeholder="e.g. 22AAAAA0000A1Z5"
               />
             </div>
           </div>
 
-          <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
-            Account Settings
+          {/* ── CRM Information ── */}
+          <h3 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+            CRM Information
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
@@ -172,15 +205,46 @@ const CustomerForm: React.FC = () => {
                 <option value="INACTIVE">Inactive</option>
               </select>
             </div>
-            
+
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Follow-up Date</label>
+              <input
+                type="date"
+                name="followUpDate"
+                className="form-control"
+                value={formData.followUpDate}
+                onChange={handleChange}
+              />
+            </div>
+
             <div className="form-group" style={{ margin: 0, gridColumn: '1 / -1' }}>
-              <label className="form-label">Billing Address</label>
+              <label className="form-label">Notes</label>
+              <textarea
+                name="notes"
+                className="form-control"
+                rows={3}
+                value={formData.notes}
+                onChange={handleChange}
+                placeholder="Interaction notes, requirements, or reminders..."
+              />
+            </div>
+          </div>
+
+          {/* ── Address ── */}
+          <h3 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+            Address
+          </h3>
+
+          <div style={{ marginBottom: '24px' }}>
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Billing / Shipping Address</label>
               <textarea
                 name="address"
                 className="form-control"
                 rows={3}
-                value={formData.address || ''}
+                value={formData.address}
                 onChange={handleChange}
+                placeholder="Street, City, State, PIN"
               />
             </div>
           </div>

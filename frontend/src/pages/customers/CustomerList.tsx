@@ -20,6 +20,7 @@ const CustomerList: React.FC = () => {
   const { user } = useAuth();
   const rolePrefix = user ? `/${user.role.toLowerCase()}` : '';
   const navigate = useNavigate();
+  const canCreate = user?.role === 'ADMIN' || user?.role === 'SALES';
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -67,7 +68,7 @@ const CustomerList: React.FC = () => {
   };
 
   const getTypeBadge = (type: string) => {
-    return <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{type}</span>;
+    return <span className="badge badge-secondary">{type}</span>;
   };
 
   return (
@@ -76,9 +77,11 @@ const CustomerList: React.FC = () => {
         <div>
           <h1 className="page-title">Customers</h1>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate(`${rolePrefix}/customers/new`)}>
-          <PlusCircle size={14} /> Add Customer
-        </button>
+        {canCreate && (
+          <button className="btn btn-primary" onClick={() => navigate(`${rolePrefix}/customers/new`)}>
+            <PlusCircle size={14} /> Add Customer
+          </button>
+        )}
       </div>
 
       <div className="toolbar" style={{ marginBottom: '12px' }}>

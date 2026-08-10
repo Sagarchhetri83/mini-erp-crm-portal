@@ -237,4 +237,36 @@ router.post('/:id/followup', requireRole('ADMIN', 'SALES'), async (req: Request,
   }
 });
 
+/**
+ * DELETE /customers/:id — Delete customer (ADMIN only)
+ * Blocked if the customer has associated challans.
+ */
+router.delete('/:id', requireRole('ADMIN'), async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id = req.params.id as string;
+    const existing = await prisma.customer.findUnique({
+      where: { id },
+      include: { _count: { select: { challans: true } } },
+    });
+
+    if (!existing) {
+      res.status(404).json({ error: 'Customer not found.' });
+      return;
+    }
+
+    if (existing._count.challans > 0) {
+      res.status(400).json({
+        error: `Cannot delete customer. They have ${existing._count.challans} challan(s) on record.`,
+      });
+      return;
+    }
+
+    await prisma.customer.delete({ where: { id } });
+    res.status(200).json({ message: 'Customer deleted successfully.' });
+  } catch (err) {
+    console.error('Delete customer error:', err);
+    res.status(500).json({ error: 'Failed to delete customer.' });
+  }
+});
+
 export default router;

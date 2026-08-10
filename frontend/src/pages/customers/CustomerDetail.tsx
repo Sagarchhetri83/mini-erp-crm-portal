@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, Edit, Trash2, Calendar, FileText, Phone, Mail, MapPin } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Calendar, FileText, Phone, Mail, MapPin, Building2, Hash } from 'lucide-react';
 
 interface Customer {
   id: string;
@@ -24,14 +24,14 @@ const CustomerDetail: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const rolePrefix = user ? `/${user.role.toLowerCase()}` : '';
-  
+
   const canEdit = user?.role === 'ADMIN' || user?.role === 'SALES';
-  
+
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Quick action states
+  // Quick CRM update state (follow-up date + notes)
   const [followUpDate, setFollowUpDate] = useState('');
   const [note, setNote] = useState('');
   const [actionError, setActionError] = useState('');
@@ -44,9 +44,10 @@ const CustomerDetail: React.FC = () => {
   const fetchCustomer = async () => {
     try {
       const res = await api.get(`/customers/${id}`);
-      setCustomer(res.data);
-      setFollowUpDate(res.data.followUpDate ? res.data.followUpDate.split('T')[0] : '');
-      setNote(res.data.notes || '');
+      const d = res.data;
+      setCustomer(d);
+      setFollowUpDate(d.followUpDate ? d.followUpDate.split('T')[0] : '');
+      setNote(d.notes || '');
     } catch {
       setError('Customer not found.');
     } finally {
@@ -61,17 +62,17 @@ const CustomerDetail: React.FC = () => {
     try {
       await api.put(`/customers/${id}`, {
         followUpDate: followUpDate || null,
-        notes: note
+        notes: note || null,
       });
       setActionSuccess('CRM details updated.');
       fetchCustomer();
-    } catch (err: any) {
+    } catch {
       setActionError('Failed to update CRM details.');
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this customer?')) return;
+    if (!window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) return;
     try {
       await api.delete(`/customers/${id}`);
       navigate(`${rolePrefix}/customers`);
@@ -97,9 +98,9 @@ const CustomerDetail: React.FC = () => {
             </div>
             <div>
               <h1 className="page-title">{customer.name}</h1>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
                 <span className={`badge badge-${customer.status.toLowerCase()}`}>{customer.status}</span>
-                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{customer.customerType}</span>
+                <span className="badge badge-secondary">{customer.customerType}</span>
               </div>
             </div>
           </div>
@@ -123,69 +124,88 @@ const CustomerDetail: React.FC = () => {
       <div className="layout-2col">
         {/* Main Details */}
         <div className="layout-main">
-          
+
+          {/* Contact Information */}
           <div className="card">
-            <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
               Contact Information
             </h3>
-            
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                <Phone size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <Phone size={14} style={{ color: 'var(--text-muted)', marginTop: '3px', flexShrink: 0 }} />
                 <div className="detail-field">
                   <div className="label">Mobile Number</div>
                   <div className="value">{customer.mobile}</div>
                 </div>
               </div>
 
-              {customer.email && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <Mail size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
-                  <div className="detail-field">
-                    <div className="label">Email Address</div>
-                    <div className="value">{customer.email}</div>
-                  </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <Mail size={14} style={{ color: 'var(--text-muted)', marginTop: '3px', flexShrink: 0 }} />
+                <div className="detail-field">
+                  <div className="label">Email Address</div>
+                  <div className="value">{customer.email || <span style={{ color: 'var(--text-muted)' }}>—</span>}</div>
                 </div>
-              )}
+              </div>
 
-              {customer.businessName && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <FileText size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
-                  <div className="detail-field">
-                    <div className="label">Business Name</div>
-                    <div className="value">{customer.businessName}</div>
-                  </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <Building2 size={14} style={{ color: 'var(--text-muted)', marginTop: '3px', flexShrink: 0 }} />
+                <div className="detail-field">
+                  <div className="label">Business Name</div>
+                  <div className="value">{customer.businessName || <span style={{ color: 'var(--text-muted)' }}>—</span>}</div>
                 </div>
-              )}
+              </div>
 
-              {customer.gstNumber && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <FileText size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
-                  <div className="detail-field">
-                    <div className="label">GST Number</div>
-                    <div className="value">{customer.gstNumber}</div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <Hash size={14} style={{ color: 'var(--text-muted)', marginTop: '3px', flexShrink: 0 }} />
+                <div className="detail-field">
+                  <div className="label">GST Number</div>
+                  <div className="value" style={{ fontFamily: 'monospace', fontSize: '13px' }}>
+                    {customer.gstNumber || <span style={{ color: 'var(--text-muted)', fontFamily: 'inherit' }}>—</span>}
                   </div>
                 </div>
-              )}
+              </div>
 
               {customer.address && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', gridColumn: '1 / -1' }}>
-                  <MapPin size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', gridColumn: '1 / -1' }}>
+                  <MapPin size={14} style={{ color: 'var(--text-muted)', marginTop: '3px', flexShrink: 0 }} />
                   <div className="detail-field">
-                    <div className="label">Billing Address</div>
+                    <div className="label">Billing / Shipping Address</div>
                     <div className="value" style={{ whiteSpace: 'pre-wrap' }}>{customer.address}</div>
                   </div>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Business Classification */}
+          <div className="card">
+            <h3 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
+              Business Classification
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              <div className="detail-field">
+                <div className="label">Customer Type</div>
+                <div className="value"><span className="badge badge-secondary">{customer.customerType}</span></div>
+              </div>
+              <div className="detail-field">
+                <div className="label">Status</div>
+                <div className="value"><span className={`badge badge-${customer.status.toLowerCase()}`}>{customer.status}</span></div>
+              </div>
+              <div className="detail-field">
+                <div className="label">Member Since</div>
+                <div className="value">{new Date(customer.createdAt).toLocaleDateString()}</div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         {/* Right Panel: CRM Context */}
         <div className="layout-sidebar">
           <div className="card">
-            <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Calendar size={16} /> CRM Details
+            <h3 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Calendar size={14} /> CRM Details
             </h3>
 
             {actionError && <div className="alert alert-error" style={{ padding: '8px', fontSize: '12px', marginBottom: '12px' }}>{actionError}</div>}
@@ -207,21 +227,44 @@ const CustomerDetail: React.FC = () => {
                 <label className="form-label" style={{ fontSize: '12px' }}>Notes</label>
                 <textarea
                   className="form-control"
-                  rows={4}
+                  rows={5}
                   style={{ fontSize: '13px', padding: '8px 10px' }}
-                  placeholder="Add notes about interactions..."
+                  placeholder="Add notes about interactions, requirements, or reminders..."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   disabled={!canEdit}
                 />
               </div>
-              
+
               {canEdit && (
                 <button type="submit" className="btn btn-secondary" style={{ width: '100%', height: '32px', fontSize: '13px' }}>
-                  Update CRM Details
+                  Save CRM Details
                 </button>
               )}
             </form>
+          </div>
+
+          {/* Quick info card */}
+          <div className="card">
+            <h3 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FileText size={14} /> Quick Info
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>Follow-up</span>
+                <span style={{ fontWeight: 500 }}>
+                  {customer.followUpDate
+                    ? new Date(customer.followUpDate).toLocaleDateString()
+                    : <span style={{ color: 'var(--text-muted)' }}>Not set</span>}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>GST</span>
+                <span style={{ fontWeight: 500, fontFamily: 'monospace', fontSize: '12px' }}>
+                  {customer.gstNumber || <span style={{ color: 'var(--text-muted)', fontFamily: 'inherit', fontSize: '13px' }}>Not provided</span>}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
