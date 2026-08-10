@@ -44,6 +44,7 @@ const ProductDetail: React.FC = () => {
   // Stock update state
   const [stockAdjustment, setStockAdjustment] = useState('');
   const [adjustmentType, setAdjustmentType] = useState<'ADD' | 'SET'>('ADD');
+  const [adjustmentReason, setAdjustmentReason] = useState('');
   const [actionError, setActionError] = useState('');
   const [actionSuccess, setActionSuccess] = useState('');
 
@@ -87,6 +88,10 @@ const ProductDetail: React.FC = () => {
     setActionSuccess('');
     
     if (!stockAdjustment) return;
+    if (!adjustmentReason.trim()) {
+      setActionError('Please enter a reason for this adjustment.');
+      return;
+    }
 
     const adjustVal = parseInt(stockAdjustment, 10);
     
@@ -125,10 +130,11 @@ const ProductDetail: React.FC = () => {
       await api.post(`/products/${id}/adjust-stock`, {
         type,
         qty,
-        reason: 'Manual adjustment'
+        reason: adjustmentReason.trim(),
       });
       setActionSuccess(`Stock updated successfully.`);
       setStockAdjustment('');
+      setAdjustmentReason('');
       fetchProduct(); // This also fetches movements now
     } catch (err: any) {
       setActionError(err.response?.data?.error || 'Failed to update stock.');
@@ -343,7 +349,7 @@ const ProductDetail: React.FC = () => {
                 {actionSuccess && <div className="alert alert-success" style={{ padding: '8px', fontSize: '12px', marginBottom: '12px' }}>{actionSuccess}</div>}
 
                 <form onSubmit={handleUpdateStock}>
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                     <select
                       className="form-control"
                       style={{ height: '32px', fontSize: '13px', width: '90px', padding: '0 8px' }}
@@ -363,6 +369,15 @@ const ProductDetail: React.FC = () => {
                       required
                     />
                   </div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    style={{ height: '32px', fontSize: '13px', marginBottom: '8px' }}
+                    placeholder="Reason (required)"
+                    value={adjustmentReason}
+                    onChange={(e) => setAdjustmentReason(e.target.value)}
+                    required
+                  />
                   <button type="submit" className="btn btn-secondary" style={{ width: '100%', height: '32px', fontSize: '13px' }}>
                     Update Stock
                   </button>

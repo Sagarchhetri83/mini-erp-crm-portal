@@ -262,4 +262,39 @@ router.post('/:id/adjust-stock', requireRole('ADMIN', 'WAREHOUSE'), async (req: 
   }
 });
 
+/**
+ * DELETE /products/:id — Delete a product (ADMIN only)
+ * Blocked if the product has existing challan items or stock movements.
+ */
+router.delete('/:id', requireRole('ADMIN'), async (req: Request, res: Response): Promise<void> => {
+  try {
+    const id = req.params.id as string;
+    const existing = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        _count: { select: { challanItems: true, stockMovements: true } },
+      },
+    });
+
+    if (!existing) {
+      res.status(404).json({ error: 'Product not found.' });
+      return;
+    }
+
+    if (existing._count.challanItems > 0) {
+      res.status(400).json({
+        error: `Cannot delete product. It appears on ${existing._count.challanItems} challan(s).`,
+      });
+      return;
+    }
+
+    await prisma.stockMovement.deleteMany({ where: { productId: id } });
+    await prisma.product.delete({ where: { id } });
+    res.status(200).json({ message: 'Product deleted successfully.' });
+  } catch (err) {
+    console.error('Delete product error:', err);
+    res.status(500).json({ error: 'Failed to delete product.' });
+  }
+});
+
 export default router;
