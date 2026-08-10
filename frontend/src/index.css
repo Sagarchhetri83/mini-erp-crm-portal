@@ -383,6 +383,7 @@ table {
   border-collapse: collapse;
   font-size: var(--font-size-table);
   text-align: left;
+  font-variant-numeric: tabular-nums;
 }
 
 th {

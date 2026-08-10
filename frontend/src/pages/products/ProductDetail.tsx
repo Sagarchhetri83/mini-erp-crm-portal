@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../lib/api';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, Edit, Trash2, Box, Info, Hash, Settings2, PackagePlus, FileText } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Box, Info, Hash, Settings2, PackagePlus, FileText, MapPin } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -14,7 +14,19 @@ interface Product {
   minStock: number;
   unit: string;
   category: string | null;
+  location: string | null;
   createdAt: string;
+}
+
+interface StockMovement {
+  id: string;
+  type: 'IN' | 'OUT';
+  qty: number;
+  reason: string;
+  createdAt: string;
+  createdBy: {
+    name: string;
+  };
 }
 
 const ProductDetail: React.FC = () => {
@@ -35,6 +47,11 @@ const ProductDetail: React.FC = () => {
   const [actionError, setActionError] = useState('');
   const [actionSuccess, setActionSuccess] = useState('');
 
+  // Stock movements state
+  const [movements, setMovements] = useState<StockMovement[]>([]);
+  const [movementsLoading, setMovementsLoading] = useState(true);
+  const [movementsError, setMovementsError] = useState('');
+
   useEffect(() => {
     fetchProduct();
   }, [id]);
@@ -43,9 +60,23 @@ const ProductDetail: React.FC = () => {
     try {
       const res = await api.get(`/products/${id}`);
       setProduct(res.data);
+      fetchMovements();
     } catch {
       setError('Product not found.');
+      setLoading(false);
+    }
+  };
+
+  const fetchMovements = async () => {
+    try {
+      setMovementsLoading(true);
+      setMovementsError('');
+      const res = await api.get(`/products/${id}/movements`);
+      setMovements(res.data);
+    } catch {
+      setMovementsError('Unable to load stock movement history.');
     } finally {
+      setMovementsLoading(false);
       setLoading(false);
     }
   };
@@ -57,27 +88,50 @@ const ProductDetail: React.FC = () => {
     
     if (!stockAdjustment) return;
 
-    let newStock = product!.stock;
     const adjustVal = parseInt(stockAdjustment, 10);
     
+    let type: 'IN' | 'OUT' = 'IN';
+    let qty = 0;
+
     if (adjustmentType === 'ADD') {
-      newStock += adjustVal;
+      if (adjustVal > 0) {
+        type = 'IN';
+        qty = adjustVal;
+      } else if (adjustVal < 0) {
+        type = 'OUT';
+        qty = Math.abs(adjustVal);
+      } else {
+        return;
+      }
     } else {
-      newStock = adjustVal;
+      // SET
+      if (adjustVal > product!.stock) {
+        type = 'IN';
+        qty = adjustVal - product!.stock;
+      } else if (adjustVal < product!.stock) {
+        type = 'OUT';
+        qty = product!.stock - adjustVal;
+      } else {
+        return;
+      }
     }
 
-    if (newStock < 0) {
+    if (type === 'OUT' && qty > product!.stock) {
       setActionError('Stock cannot be negative.');
       return;
     }
 
     try {
-      await api.put(`/products/${id}`, { stock: newStock });
+      await api.post(`/products/${id}/adjust-stock`, {
+        type,
+        qty,
+        reason: 'Manual adjustment'
+      });
       setActionSuccess(`Stock updated successfully.`);
       setStockAdjustment('');
-      fetchProduct();
+      fetchProduct(); // This also fetches movements now
     } catch (err: any) {
-      setActionError('Failed to update stock.');
+      setActionError(err.response?.data?.error || 'Failed to update stock.');
     }
   };
 
@@ -174,6 +228,16 @@ const ProductDetail: React.FC = () => {
                 </div>
               </div>
 
+              {product.location && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <MapPin size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
+                  <div className="detail-field">
+                    <div className="label">Location</div>
+                    <div className="value">{product.location}</div>
+                  </div>
+                </div>
+              )}
+
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', gridColumn: '1 / -1' }}>
                 <FileText size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
                 <div className="detail-field">
@@ -182,6 +246,73 @@ const ProductDetail: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Stock Movement History */}
+          <div className="card">
+            <div className="card-header" style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Box size={16} /> Stock Movement History
+              </div>
+            </div>
+            
+            {movementsLoading ? (
+              <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                Loading stock history...
+              </div>
+            ) : movementsError ? (
+              <div className="alert alert-error" style={{ marginBottom: 0 }}>
+                {movementsError}
+                <button className="btn btn-secondary" style={{ marginLeft: '12px', height: '24px', padding: '0 8px', fontSize: '11px' }} onClick={fetchMovements}>Retry</button>
+              </div>
+            ) : movements.length === 0 ? (
+              <div className="empty-state" style={{ padding: '24px 12px' }}>
+                No stock movements recorded yet.
+              </div>
+            ) : (
+              <div className="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>DATE</th>
+                      <th>TYPE</th>
+                      <th style={{ textAlign: 'right' }}>QUANTITY</th>
+                      <th>REASON</th>
+                      <th>CREATED BY</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {movements.map((m) => (
+                      <tr key={m.id}>
+                        <td>
+                          {new Date(m.createdAt).toLocaleDateString()}
+                          <span style={{ color: 'var(--text-muted)', marginLeft: '8px', fontSize: '11px' }}>
+                            {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={m.type === 'IN' ? 'badge badge-success' : 'badge badge-error'}>
+                            {m.type}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: 'right', fontWeight: 500 }}>
+                          {m.type === 'IN' ? '+' : '-'}{m.qty}
+                        </td>
+                        <td>{m.reason}</td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div className="avatar-initial" style={{ width: '20px', height: '20px', fontSize: '10px' }}>
+                              {m.createdBy.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span style={{ fontSize: '13px' }}>{m.createdBy.name}</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
 

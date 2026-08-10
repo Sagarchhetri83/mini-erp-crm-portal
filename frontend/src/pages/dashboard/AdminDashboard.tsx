@@ -73,7 +73,7 @@ const AdminDashboard: React.FC = () => {
                       <th>CHALLAN NO</th>
                       <th>CUSTOMER</th>
                       <th>DATE</th>
-                      <th>AMOUNT</th>
+                      <th style={{ textAlign: 'right' }}>AMOUNT</th>
                       <th>STATUS</th>
                     </tr>
                   </thead>
@@ -85,7 +85,7 @@ const AdminDashboard: React.FC = () => {
                         </td>
                         <td>{c.customer?.name}</td>
                         <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-                        <td style={{ fontWeight: 500 }}>₹{c.totalAmount.toFixed(2)}</td>
+                        <td style={{ fontWeight: 500, textAlign: 'right' }}>₹{c.totalAmount.toFixed(2)}</td>
                         <td>
                           <span className={`badge badge-${c.status.toLowerCase()}`}>{c.status}</span>
                         </td>

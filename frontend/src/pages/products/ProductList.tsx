@@ -13,6 +13,7 @@ interface Product {
   minStock: number;
   unit: string;
   category: string | null;
+  location: string | null;
 }
 
 const ProductList: React.FC = () => {
@@ -125,7 +126,9 @@ const ProductList: React.FC = () => {
                 <th>CATEGORY</th>
                 <th style={{ textAlign: 'right' }}>PRICE</th>
                 <th style={{ textAlign: 'right' }}>CURRENT STOCK</th>
+                <th style={{ textAlign: 'right' }}>MIN STOCK</th>
                 <th>STATUS</th>
+                <th>LOCATION</th>
                 <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
               </tr>
             </thead>
@@ -164,11 +167,15 @@ const ProductList: React.FC = () => {
                     <td style={{ textAlign: 'right' }}>
                       {p.stock} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.unit}</span>
                     </td>
+                    <td style={{ textAlign: 'right' }}>
+                      {p.minStock} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.unit}</span>
+                    </td>
                     <td>
                       <div className={`status-dot ${statusClass}`}>
                         {statusText}
                       </div>
                     </td>
+                    <td>{p.location || '—'}</td>
                     <td style={{ textAlign: 'right' }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <button

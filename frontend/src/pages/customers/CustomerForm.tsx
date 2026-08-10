@@ -15,6 +15,7 @@ const CustomerForm: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
+    businessName: '',
     email: '',
     address: '',
     gstNumber: '',
@@ -105,6 +106,17 @@ const CustomerForm: React.FC = () => {
               />
             </div>
             
+            <div className="form-group" style={{ margin: 0 }}>
+              <label className="form-label">Business Name</label>
+              <input
+                type="text"
+                name="businessName"
+                className="form-control"
+                value={formData.businessName || ''}
+                onChange={handleChange}
+              />
+            </div>
+
             <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Email</label>
               <input

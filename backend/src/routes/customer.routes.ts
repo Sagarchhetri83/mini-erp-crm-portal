@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient, CustomerType, CustomerStatus } from '@prisma/client';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireRole } from '../middleware/auth';
 
 const router: Router = Router();
 const prisma = new PrismaClient();
@@ -11,9 +11,9 @@ router.use(requireAuth);
 /**
  * POST /customers — Create a new customer
  */
-router.post('/', async (req: Request, res: Response): Promise<void> => {
+router.post('/', requireRole('ADMIN', 'SALES'), async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, mobile, email, customerType, status, address, gstNumber, followUpDate, notes } = req.body;
+    const { name, mobile, email, businessName, customerType, status, address, gstNumber, followUpDate, notes } = req.body;
 
     // Validate required fields
     if (!name || !mobile || !customerType) {
@@ -37,6 +37,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         name,
         mobile,
         email: email || null,
+        businessName: businessName || null,
         customerType: customerType as CustomerType,
         status: (status as CustomerStatus) || 'LEAD',
         address: address || null,
@@ -133,7 +134,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
 /**
  * PUT /customers/:id — Update customer
  */
-router.put('/:id', async (req: Request, res: Response): Promise<void> => {
+router.put('/:id', requireRole('ADMIN', 'SALES'), async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
     const existing = await prisma.customer.findUnique({ where: { id } });
@@ -142,7 +143,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const { name, mobile, email, customerType, status, address, gstNumber, followUpDate, notes } = req.body;
+    const { name, mobile, email, businessName, customerType, status, address, gstNumber, followUpDate, notes } = req.body;
 
     // Validate required fields if provided
     if (name !== undefined && !name) {
@@ -168,6 +169,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
     if (name !== undefined) updateData.name = name;
     if (mobile !== undefined) updateData.mobile = mobile;
     if (email !== undefined) updateData.email = email || null;
+    if (businessName !== undefined) updateData.businessName = businessName || null;
     if (customerType !== undefined) updateData.customerType = customerType;
     if (status !== undefined) updateData.status = status;
     if (address !== undefined) updateData.address = address || null;
@@ -191,7 +193,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
  * POST /customers/:id/followup — Add a follow-up (updates followUpDate and appends to notes)
  * Body: { followUpDate: "2024-01-15", note: "Called customer, interested in bulk order" }
  */
-router.post('/:id/followup', async (req: Request, res: Response): Promise<void> => {
+router.post('/:id/followup', requireRole('ADMIN', 'SALES'), async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
     const existing = await prisma.customer.findUnique({ where: { id } });

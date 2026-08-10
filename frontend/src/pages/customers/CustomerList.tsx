@@ -9,6 +9,7 @@ interface Customer {
   name: string;
   mobile: string;
   email: string | null;
+  businessName: string | null;
   customerType: string;
   status: string;
   followUpDate: string | null;
@@ -139,6 +140,7 @@ const CustomerList: React.FC = () => {
               <tr>
                 <th>CUSTOMER</th>
                 <th>MOBILE</th>
+                <th>BUSINESS</th>
                 <th>TYPE</th>
                 <th>STATUS</th>
                 <th>FOLLOW-UP</th>
@@ -164,6 +166,7 @@ const CustomerList: React.FC = () => {
                     </div>
                   </td>
                   <td>{c.mobile}</td>
+                  <td>{c.businessName || '—'}</td>
                   <td>{getTypeBadge(c.customerType)}</td>
                   <td>{getStatusBadge(c.status)}</td>
                   <td style={{ color: 'var(--text-secondary)' }}>

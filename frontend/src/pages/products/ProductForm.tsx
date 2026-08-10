@@ -21,6 +21,7 @@ const ProductForm: React.FC = () => {
     minStock: 0,
     unit: 'pcs',
     category: '',
+    location: '',
   });
 
   const [loading, setLoading] = useState(isEdit);
@@ -190,6 +191,18 @@ const ProductForm: React.FC = () => {
                 value={formData.minStock}
                 onChange={handleChange}
                 required
+              />
+            </div>
+            
+            <div className="form-group" style={{ margin: 0, gridColumn: '1 / -1' }}>
+              <label className="form-label">Location/Warehouse</label>
+              <input
+                type="text"
+                name="location"
+                className="form-control"
+                value={formData.location || ''}
+                onChange={handleChange}
+                placeholder="e.g. Warehouse A, Shelf 3"
               />
             </div>
           </div>

@@ -9,6 +9,7 @@ interface Customer {
   name: string;
   mobile: string;
   email: string | null;
+  businessName: string | null;
   address: string | null;
   gstNumber: string | null;
   customerType: string;
@@ -143,6 +144,16 @@ const CustomerDetail: React.FC = () => {
                   <div className="detail-field">
                     <div className="label">Email Address</div>
                     <div className="value">{customer.email}</div>
+                  </div>
+                </div>
+              )}
+
+              {customer.businessName && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <FileText size={16} style={{ color: 'var(--text-muted)', marginTop: '2px' }} />
+                  <div className="detail-field">
+                    <div className="label">Business Name</div>
+                    <div className="value">{customer.businessName}</div>
                   </div>
                 </div>
               )}

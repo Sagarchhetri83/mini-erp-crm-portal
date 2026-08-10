@@ -64,6 +64,7 @@ model Customer {
   name         String
   mobile       String
   email        String?
+  businessName String?
   customerType CustomerType   @default(RETAIL)
   status       CustomerStatus @default(LEAD)
   address      String?

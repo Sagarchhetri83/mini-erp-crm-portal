@@ -7,7 +7,6 @@ import {
   Package, 
   FileText, 
   Settings, 
-  LogOut,
   Search,
   Bell,
   Box,

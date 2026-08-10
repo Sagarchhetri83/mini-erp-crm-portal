@@ -7,9 +7,20 @@ export interface DashboardStats {
     totalProducts: number;
     totalChallans: number;
     lowStockCount: number;
+    outOfStockCount: number;
+    confirmedSalesValue: number;
+    confirmedCount: number;
+    averageChallanValue: number;
+    statusDistribution: {
+      DRAFT: number;
+      CONFIRMED: number;
+      CANCELLED: number;
+    };
+    followUpCount: number;
   };
   lowStockProducts: any[];
   recentChallans: any[];
+  recentMovements: any[];
 }
 
 export function useDashboardStats() {
