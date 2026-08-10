@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  SALES
+  WAREHOUSE
+  ACCOUNTS
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+  DISTRIBUTOR
+}
+
+enum CustomerStatus {
+  LEAD
+  ACTIVE
+  INACTIVE
+}
+
+enum ChallanStatus {
+  DRAFT
+  CONFIRMED
+  CANCELLED
+}
+
+enum StockMovementType {
+  IN
+  OUT
+}
+
+// ── Models ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(SALES)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  challans       Challan[]
+  stockMovements StockMovement[]
+
+  @@map("users")
+}
+
+model Customer {
+  id           String         @id @default(cuid())
+  name         String
+  mobile       String
+  email        String?
+  customerType CustomerType   @default(RETAIL)
+  status       CustomerStatus @default(LEAD)
+  address      String?
+  gstNumber    String?
+  followUpDate DateTime?
+  notes        String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  challans Challan[]
+
+  @@map("customers")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  sku         String   @unique
+  price       Float
+  unit        String   @default("PCS")
+  stock       Int      @default(0)
+  minStock    Int      @default(0)
+  category    String?
+  location    String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  challanItems   ChallanItem[]
+  stockMovements StockMovement[]
+
+  @@map("products")
+}
+
+model Challan {
+  id          String        @id @default(cuid())
+  challanNo   String        @unique
+  customerId  String
+  customer    Customer      @relation(fields: [customerId], references: [id])
+  status      ChallanStatus @default(DRAFT)
+  totalAmount Float         @default(0)
+  createdById String
+  createdBy   User          @relation(fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  items ChallanItem[]
+
+  @@map("challans")
+}
+
+model ChallanItem {
+  id            String  @id @default(cuid())
+  challanId     String
+  challan       Challan @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product @relation(fields: [productId], references: [id])
+  productName   String
+  priceSnapshot Float
+  qty           Int
+  lineTotal     Float
+
+  @@map("challan_items")
+}
+
+model StockMovement {
+  id          String            @id @default(cuid())
+  productId   String
+  product     Product           @relation(fields: [productId], references: [id])
+  type        StockMovementType
+  qty         Int
+  reason      String
+  createdById String
+  createdBy   User              @relation(fields: [createdById], references: [id])
+  createdAt   DateTime          @default(now())
+
+  @@map("stock_movements")
+}
