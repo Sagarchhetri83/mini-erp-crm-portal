@@ -732,78 +732,86 @@ tbody tr:hover {
 }
 
 /* ---------------------------------
-   PRINT STYLES
+   PRINT STYLES (Professional A4)
    --------------------------------- */
+.print-only {
+  display: none !important;
+}
+
 @media print {
-  /* Hide UI components not needed for print */
+  .print-only {
+    display: block !important;
+  }
+  /* Page Setup */
+  @page {
+    size: A4;
+    margin: 12mm 14mm;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide Application Shell & UI */
   .sidebar, 
   .top-header, 
   .btn, 
   .btn-icon, 
-  .page-header button, 
-  .pagination-wrapper,
+  .page-header, 
   .toolbar,
-  .search-box {
+  .search-box,
+  .pagination-wrapper,
+  .hide-on-print {
     display: none !important;
   }
 
-  /* Reset layout to full width */
+  /* Reset layout constraints */
   .app-layout {
-    display: block;
-    height: auto;
-    overflow: visible;
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
   }
   
   .main-content {
-    display: block;
-    overflow: visible;
+    display: block !important;
+    overflow: visible !important;
+    background: transparent !important;
   }
   
   .workspace {
-    padding: 0;
-    overflow: visible;
+    padding: 0 !important;
+    overflow: visible !important;
   }
-  
-  /* Flatten the 70/30 layout for print */
+
+  /* Flatten structure for print */
   .layout-2col {
-    display: block;
+    display: block !important;
   }
   
   .layout-main, .layout-sidebar {
-    width: 100%;
-    margin-bottom: 24px;
-    display: block;
+    width: 100% !important;
+    display: block !important;
   }
 
-  /* Remove card styling constraints for print */
+  /* Remove all card styles that interfere with document flow */
   .card {
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    margin-bottom: 16px;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-bottom: 24px !important;
+    background: transparent !important;
   }
 
-  /* Table print optimization */
-  .table-wrapper {
-    border: 1px solid #ccc;
-    box-shadow: none;
-  }
-
-  th {
-    background-color: #f5f5f5 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Page setup */
-  @page {
-    size: A4;
-    margin: 20mm;
-  }
-
-  body {
-    background: white;
-    color: black;
-  }
+  /* Typography scale for A4 print */
+  .print-document-title { font-size: 22px !important; font-weight: 700 !important; letter-spacing: 0.5px; }
+  .print-section-heading { font-size: 12px !important; font-weight: 600 !important; text-transform: uppercase; color: #4B5563 !important; }
+  .print-body { font-size: 11px !important; color: #111827 !important; line-height: 1.5; }
+  .print-table { font-size: 10px !important; }
+  .print-muted { color: #6B7280 !important; }
+  .print-font-mono { font-family: monospace !important; }
 }
-
