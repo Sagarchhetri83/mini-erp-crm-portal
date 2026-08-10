@@ -18,6 +18,10 @@ import ProductList from './pages/products/ProductList';
 import ProductForm from './pages/products/ProductForm';
 import ProductDetail from './pages/products/ProductDetail';
 
+import ChallanList from './pages/challans/ChallanList';
+import NewChallan from './pages/challans/NewChallan';
+import ChallanDetail from './pages/challans/ChallanDetail';
+
 function AppRoutes() {
   const { user } = useAuth();
 
@@ -36,6 +40,11 @@ function AppRoutes() {
       <Route path="/products/new" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
       <Route path="/products/:id/edit" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
       <Route path="/products/:id" element={<ProtectedRoute><ProductDetail /></ProtectedRoute>} />
+
+      {/* Challan Routes */}
+      <Route path="/challans" element={<ProtectedRoute><ChallanList /></ProtectedRoute>} />
+      <Route path="/challans/new" element={<ProtectedRoute><NewChallan /></ProtectedRoute>} />
+      <Route path="/challans/:id" element={<ProtectedRoute><ChallanDetail /></ProtectedRoute>} />
       
       <Route
         path="/"
@@ -48,7 +57,8 @@ function AppRoutes() {
               </p>
               <div style={{ marginTop: '20px' }}>
                 <a href="/customers" style={{ marginRight: '10px' }} className="btn btn-primary">Go to Customers</a>
-                <a href="/products" className="btn btn-primary">Go to Products</a>
+                <a href="/products" style={{ marginRight: '10px' }} className="btn-primary btn">Go to Products</a>
+                <a href="/challans" className="btn btn-primary">Go to Challans</a>
               </div>
             </div>
           </ProtectedRoute>
