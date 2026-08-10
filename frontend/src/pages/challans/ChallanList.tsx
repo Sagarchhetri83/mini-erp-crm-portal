@@ -131,9 +131,9 @@ const ChallanList: React.FC = () => {
                 <th>CHALLAN</th>
                 <th>CUSTOMER</th>
                 <th>DATE</th>
-                <th>AMOUNT</th>
-                <th>CREATED BY</th>
+                <th style={{ textAlign: 'right' }}>AMOUNT</th>
                 <th>STATUS</th>
+                <th>CREATED BY</th>
                 <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
               </tr>
             </thead>
@@ -150,9 +150,9 @@ const ChallanList: React.FC = () => {
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{c.customer.mobile}</div>
                   </td>
                   <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-                  <td style={{ fontWeight: 500 }}>₹{c.totalAmount.toFixed(2)}</td>
-                  <td style={{ color: 'var(--text-secondary)' }}>{c.createdBy.name}</td>
+                  <td style={{ fontWeight: 500, textAlign: 'right' }}>₹{c.totalAmount.toFixed(2)}</td>
                   <td>{getStatusBadge(c.status)}</td>
+                  <td style={{ color: 'var(--text-secondary)' }}>{c.createdBy.name}</td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <button

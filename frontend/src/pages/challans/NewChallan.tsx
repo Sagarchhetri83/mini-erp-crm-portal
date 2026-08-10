@@ -185,10 +185,10 @@ const NewChallan: React.FC = () => {
                   <thead>
                     <tr>
                       <th style={{ width: '45%' }}>Product</th>
-                      <th style={{ width: '15%' }}>Price</th>
+                      <th style={{ width: '15%', textAlign: 'right' }}>Price</th>
                       <th style={{ width: '15%' }}>Quantity</th>
-                      <th style={{ width: '15%' }}>Total</th>
-                      <th style={{ width: '10%', textAlign: 'right' }}>Actions</th>
+                      <th style={{ width: '15%', textAlign: 'right' }}>Line Total</th>
+                      <th style={{ width: '10%', textAlign: 'right' }}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -216,7 +216,7 @@ const NewChallan: React.FC = () => {
                             </select>
                             {prod && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{prod.stock} in stock</div>}
                           </td>
-                          <td>₹{price.toFixed(2)}</td>
+                          <td style={{ textAlign: 'right' }}>₹{price.toFixed(2)}</td>
                           <td>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <input
@@ -225,13 +225,13 @@ const NewChallan: React.FC = () => {
                                 className="form-control"
                                 value={item.qty}
                                 onChange={(e) => handleItemChange(index, 'qty', parseInt(e.target.value) || 0)}
-                                style={{ width: '80px' }}
+                                style={{ width: '80px', textAlign: 'right' }}
                                 required
                               />
                               <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{unit}</span>
                             </div>
                           </td>
-                          <td style={{ fontWeight: 500 }}>₹{lineTotal.toFixed(2)}</td>
+                          <td style={{ fontWeight: 500, textAlign: 'right' }}>₹{lineTotal.toFixed(2)}</td>
                           <td style={{ textAlign: 'right' }}>
                             <button
                               type="button"

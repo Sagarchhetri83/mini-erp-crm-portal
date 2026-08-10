@@ -121,9 +121,11 @@ const ProductList: React.FC = () => {
             <thead>
               <tr>
                 <th>PRODUCT</th>
+                <th>SKU</th>
                 <th>CATEGORY</th>
-                <th>PRICE</th>
-                <th>STOCK STATUS</th>
+                <th style={{ textAlign: 'right' }}>PRICE</th>
+                <th style={{ textAlign: 'right' }}>CURRENT STOCK</th>
+                <th>STATUS</th>
                 <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
               </tr>
             </thead>
@@ -150,21 +152,21 @@ const ProductList: React.FC = () => {
                           <Box size={16} style={{ color: 'var(--text-muted)' }} />
                         </div>
                         <div>
-                          <Link to={`${rolePrefix}/products/${p.id}`} className="cell-title" style={{ fontFamily: 'monospace' }}>
+                          <Link to={`${rolePrefix}/products/${p.id}`} className="cell-title">
                             {p.name}
                           </Link>
-                          <div className="cell-subtitle">{p.sku}</div>
                         </div>
                       </div>
                     </td>
+                    <td style={{ fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{p.sku}</td>
                     <td>{p.category || '—'}</td>
-                    <td>₹{p.price.toFixed(2)}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 500 }}>₹{p.price.toFixed(2)}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      {p.stock} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.unit}</span>
+                    </td>
                     <td>
                       <div className={`status-dot ${statusClass}`}>
                         {statusText}
-                      </div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        {p.stock} {p.unit} available
                       </div>
                     </td>
                     <td style={{ textAlign: 'right' }}>

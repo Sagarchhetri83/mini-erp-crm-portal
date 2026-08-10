@@ -11,8 +11,8 @@ const AnalyticsContainer: React.FC = () => {
   if (error) return <div className="alert alert-error">{error}</div>;
   if (!data || !user) return null;
 
-  // Derive some basic analytics from the available dashboard stats payload
-  // In a real application with heavy data, this would come from a dedicated /analytics backend endpoint
+  // We only show metrics that are 100% reliable from the backend stats payload.
+  // We do NOT fabricate "Total Sales" or "Average Challan Value" from the limited recentChallans array.
   
   const recentChallans = data.recentChallans;
   
@@ -20,7 +20,10 @@ const AnalyticsContainer: React.FC = () => {
   const draftChallans = recentChallans.filter(c => c.status === 'DRAFT');
   const cancelledChallans = recentChallans.filter(c => c.status === 'CANCELLED');
   
-  const recentSalesValue = recentChallans.reduce((sum, c) => sum + c.totalAmount, 0);
+  const totalRecent = recentChallans.length || 1; // avoid division by zero
+  const confirmedPct = (confirmedChallans.length / totalRecent) * 100;
+  const draftPct = (draftChallans.length / totalRecent) * 100;
+  const cancelledPct = (cancelledChallans.length / totalRecent) * 100;
 
   const renderAdminAnalytics = () => (
     <>
@@ -48,8 +51,16 @@ const AnalyticsContainer: React.FC = () => {
         <div className="layout-main">
           <div className="card">
             <h3 style={{ fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FileText size={16} /> Recent Challan Status Distribution
+              <FileText size={16} /> Recent Challans Overview
             </h3>
+            
+            {/* Real CSS Chart based on actual data proportions */}
+            <div style={{ height: '12px', display: 'flex', borderRadius: '6px', overflow: 'hidden', marginBottom: '20px', background: 'var(--border-color)' }}>
+              {confirmedChallans.length > 0 && <div style={{ width: `${confirmedPct}%`, background: 'var(--success)', transition: 'width 0.5s ease' }} title="Confirmed" />}
+              {draftChallans.length > 0 && <div style={{ width: `${draftPct}%`, background: 'var(--warning)', transition: 'width 0.5s ease' }} title="Draft" />}
+              {cancelledChallans.length > 0 && <div style={{ width: `${cancelledPct}%`, background: 'var(--danger)', transition: 'width 0.5s ease' }} title="Cancelled" />}
+            </div>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -70,7 +81,9 @@ const AnalyticsContainer: React.FC = () => {
                 <span style={{ fontWeight: 600 }}>{cancelledChallans.length}</span>
               </div>
             </div>
-            <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-muted)' }}>*Based on most recent transaction data</div>
+            <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+              *Distribution of the most recent transactions currently loaded in the system.
+            </div>
           </div>
         </div>
 
@@ -105,11 +118,11 @@ const AnalyticsContainer: React.FC = () => {
             <div style={{ fontSize: '20px', fontWeight: 600 }}>{data.metrics.totalCustomers}</div>
           </div>
           <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Recent Sales Value</div>
-            <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--success)' }}>₹{recentSalesValue.toLocaleString()}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Challans Created</div>
+            <div style={{ fontSize: '20px', fontWeight: 600 }}>{data.metrics.totalChallans}</div>
           </div>
           <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Confirmed Transactions</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Recent Confirmed</div>
             <div style={{ fontSize: '20px', fontWeight: 600 }}>{confirmedChallans.length}</div>
           </div>
         </div>
@@ -151,19 +164,22 @@ const AnalyticsContainer: React.FC = () => {
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Recent Sales Volume</div>
-            <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--success)' }}>₹{recentSalesValue.toLocaleString()}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total System Challans</div>
+            <div style={{ fontSize: '20px', fontWeight: 600 }}>{data.metrics.totalChallans}</div>
           </div>
           <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Average Transaction</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Recent Confirmed</div>
             <div style={{ fontSize: '20px', fontWeight: 600 }}>
-              {recentChallans.length > 0 ? `₹${(recentSalesValue / recentChallans.length).toFixed(2)}` : '₹0'}
+              {confirmedChallans.length}
             </div>
           </div>
           <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Pending Drafts</div>
             <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--warning)' }}>{draftChallans.length}</div>
           </div>
+        </div>
+        <div style={{ marginTop: '16px', fontSize: '12px', color: 'var(--text-muted)' }}>
+          * Financial metrics will be displayed here once full accounting aggregation endpoints are implemented in the backend.
         </div>
       </div>
     </>
