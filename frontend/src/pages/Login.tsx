@@ -1,84 +1,150 @@
-import React, { useState } from 'react';
-import type { FormEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Login: React.FC = () => {
-  const { login } = useAuth();
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e: FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      switch (user.role) {
+        case 'ADMIN':
+          navigate('/admin', { replace: true });
+          break;
+        case 'SALES':
+          navigate('/sales', { replace: true });
+          break;
+        case 'WAREHOUSE':
+          navigate('/warehouse', { replace: true });
+          break;
+        case 'ACCOUNTS':
+          navigate('/accounts', { replace: true });
+          break;
+        default:
+          navigate('/unauthorized', { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-
+    setIsSubmitting(true);
+    
     try {
       await login(email, password);
-      navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
+      if (err.response?.status === 401) {
+        setError('Invalid email or password.');
+      } else if (err.response?.status === 403) {
+        setError('You are not authorized to access this application.');
+      } else {
+        setError('Unable to connect to the server. Please try again.');
+      }
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="logo">📦</div>
-        <h1>Mini ERP</h1>
-        <p className="subtitle">Operations Portal — Sign in to continue</p>
+    <div className="app-layout" style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-app)' }}>
+      <div className="card" style={{ maxWidth: '380px', width: '100%', padding: '40px 32px' }}>
+        
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '24px' }}>
+            <div style={{ width: '32px', height: '32px', backgroundColor: 'var(--primary)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: 'white', fontWeight: 700, fontSize: '16px' }}>M</span>
+            </div>
+            <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+              MiniERP
+            </span>
+          </div>
+          <h1 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Welcome back</h1>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>Sign in to your account</p>
+        </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && (
+          <div className="alert alert-error" style={{ marginBottom: '20px' }}>
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="email">Email Address</label>
+          <div className="form-group" style={{ marginBottom: '20px' }}>
+            <label className="form-label">Email</label>
             <input
-              id="email"
               type="email"
               className="form-control"
+              placeholder="Enter email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@erp.com"
               required
-              autoFocus
+              disabled={isSubmitting}
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
+          <div className="form-group" style={{ marginBottom: '28px' }}>
+            <label className="form-label">Password</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                className="form-control"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isSubmitting}
+                style={{ paddingRight: '40px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+                disabled={isSubmitting}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary btn-lg"
-            disabled={loading}
-            style={{ width: '100%', marginTop: '8px' }}
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            style={{ width: '100%', justifyContent: 'center', height: '40px' }}
+            disabled={isSubmitting}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="spinner" style={{ width: '14px', height: '14px', borderWidth: '2px', borderTopColor: 'white' }} />
+                Signing in...
+              </span>
+            ) : (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                Sign In
+              </span>
+            )}
           </button>
         </form>
-
-        <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
-          <p>Test Credentials (Password: Password123)</p>
-          <p style={{ marginTop: '4px' }}>
-            admin@erp.com · sales@erp.com · warehouse@erp.com · accounts@erp.com
-          </p>
-        </div>
       </div>
     </div>
   );
