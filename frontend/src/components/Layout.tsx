@@ -12,7 +12,8 @@ import {
   Bell,
   Box,
   ChartNoAxesCombined,
-  UserCircle
+  UserCircle,
+  MoreHorizontal
 } from 'lucide-react';
 
 const Layout: React.FC = () => {
@@ -157,7 +158,9 @@ const Layout: React.FC = () => {
       {/* Sidebar Navigation */}
       <aside className="sidebar">
         <div className="sidebar-header">
-          <Box size={18} style={{ color: 'var(--primary)' }} />
+          <div style={{ background: '#A78BFA', padding: '6px', borderRadius: '8px', display: 'flex' }}>
+            <Box size={18} style={{ color: '#FFFFFF' }} />
+          </div>
           <h2>MiniERP</h2>
         </div>
         
@@ -169,12 +172,17 @@ const Layout: React.FC = () => {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-info-mini">
+          <img 
+            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=374151&color=fff&size=40`} 
+            alt={user.name} 
+            style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0 }}
+          />
+          <div className="user-info-mini" style={{ marginLeft: '12px', flex: 1, overflow: 'hidden' }}>
             <span className="name">{user.name}</span>
-            <span className="role">{user.role}</span>
+            <span className="role">{user.role.toLowerCase()}@erp.com</span>
           </div>
           <button className="btn-signout-icon" onClick={handleLogout} title="Sign Out">
-            <LogOut size={14} />
+            <MoreHorizontal size={16} />
           </button>
         </div>
       </aside>
