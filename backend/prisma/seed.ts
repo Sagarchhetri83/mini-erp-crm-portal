@@ -31,6 +31,35 @@ async function main() {
     console.log(`  ✅ User: ${user.role}`);
   }
 
+  // --- SAFE LEGACY DATA CLEANUP ---
+  // Safely remove legacy generic seed data so it doesn't clutter production.
+  const legacyProductSkus = ['SKU-001', 'SKU-002', 'SKU-003', 'SKU-004', 'SKU-005', 'SKU-006', 'SKU-007', 'SKU-008', 'SKU-009', 'SKU-010'];
+  const legacyChallanNos = ['CHL-2026-0001', 'CHL-2026-0002', 'CHL-2026-0003'];
+
+  // Delete legacy Challan Items manually to avoid foreign key restrict errors
+  await prisma.challanItem.deleteMany({
+    where: { challan: { challanNo: { in: legacyChallanNos } } }
+  });
+
+  // Delete legacy Challans
+  await prisma.challan.deleteMany({
+    where: { challanNo: { in: legacyChallanNos } }
+  });
+
+  // Delete legacy Stock Movements
+  await prisma.stockMovement.deleteMany({
+    where: { OR: [
+      { id: { startsWith: 'seed-mov-' } },
+      { product: { sku: { in: legacyProductSkus } } }
+    ]}
+  });
+
+  // Delete legacy Products
+  await prisma.product.deleteMany({
+    where: { sku: { in: legacyProductSkus } }
+  });
+  console.log(`  ✅ Cleaned up legacy demo data`);
+
   // 2. Customers
   const customers = [
     { id: 'seed-cust-1', name: 'Rajesh Sharma', businessName: 'Sharma Electronics', email: 'rajesh@sharmaelectronics.in', mobile: '9876543210', customerType: 'RETAIL' as const, status: 'ACTIVE' as const, address: 'Ahmedabad, Gujarat', gstNumber: '24ABCDE1234F1Z5' },
@@ -43,7 +72,16 @@ async function main() {
   for (const c of customers) {
     await prisma.customer.upsert({
       where: { id: c.id },
-      update: {},
+      update: {
+        name: c.name,
+        businessName: c.businessName,
+        email: c.email,
+        mobile: c.mobile,
+        customerType: c.customerType,
+        status: c.status,
+        address: c.address,
+        gstNumber: c.gstNumber,
+      },
       create: { ...c },
     });
   }
@@ -67,7 +105,15 @@ async function main() {
   for (const p of products) {
     const upserted = await prisma.product.upsert({
       where: { sku: p.sku },
-      update: {},
+      update: {
+        name: p.name,
+        price: p.price,
+        stock: p.stock,
+        minStock: p.minStock,
+        category: p.category,
+        description: p.description,
+        location: p.location
+      },
       create: { ...p },
     });
     dbProducts.push(upserted);
@@ -173,7 +219,9 @@ async function main() {
   const tplRouter = dbProducts.find(p => p.sku === 'TPL-ARCH-C6')!;
   await prisma.stockMovement.upsert({
     where: { id: 'seed-mov-5' },
-    update: {},
+    update: {
+      productId: tplRouter.id, type: 'OUT', qty: 3, reason: 'Sales Challan CHL-2026-0004 (Archived)'
+    },
     create: { id: 'seed-mov-5', productId: tplRouter.id, type: 'OUT', qty: 3, reason: 'Sales Challan CHL-2026-0004 (Archived)', createdById: adminUserId }
   });
   console.log(`  ✅ Seeded Stock Movements`);
