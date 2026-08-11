@@ -1,39 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Colors */
-  --bg-app: #F7F8FA;
+  /* Colors - Warm ERP / Accounting Palette */
+  --bg-app: #FAFAF8;
   --bg-surface: #FFFFFF;
-  --bg-sidebar: #17191F;
-  --bg-sidebar-hover: #2d303b;
-  --bg-sidebar-active: #252834;
+  --bg-sidebar: #F5F3EE;
+  --bg-sidebar-hover: #EBE8E0;
+  --bg-sidebar-active: #FFFFFF;
   
-  --text-primary: #171A21;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
+  --text-primary: #343434;
+  --text-secondary: #74726D;
+  --text-muted: #9A9892;
   
-  --border-color: #E7E8EC;
+  --border-color: #ECEAE5;
   
-  --primary: #5B5CE2;
-  --primary-hover: #4a4bcd;
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
   
-  --success: #22C55E;
-  --success-bg: #dcfce7;
-  --warning: #F59E0B;
-  --warning-bg: #fef3c7;
-  --danger: #EF4444;
-  --danger-bg: #fee2e2;
+  --success: #16A34A;
+  --success-bg: #F0FDF4;
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
 
   /* Typography */
-  --font-family: 'Inter', sans-serif;
-  --font-size-title: 22px;
-  --font-size-section: 15px;
-  --font-size-body: 14px;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-size-title: 24px;
+  --font-size-section: 14px;
+  --font-size-body: 13px;
   --font-size-table: 13px;
   --font-size-meta: 12px;
   
   /* Layout */
-  --sidebar-width: 180px;
+  --sidebar-width: 220px;
   --header-height: 56px;
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -76,67 +76,76 @@ button {
   overflow: hidden;
 }
 
-/* Sidebar */
+/* Sidebar - Light Warm ERP Style */
 .sidebar {
-  width: 220px;
-  background-color: #17191F;
-  color: #FFFFFF;
+  width: var(--sidebar-width);
+  background-color: var(--bg-sidebar);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  border-right: none;
+  border-right: 1px solid var(--border-color);
   overflow-y: auto;
   transition: transform 0.3s ease;
 }
 
 .sidebar-header {
-  height: 80px;
+  height: 64px;
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  gap: 12px;
-  border-bottom: none;
+  padding: 0 20px;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-header h2 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #FFFFFF;
-  letter-spacing: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
 }
 
 .sidebar-nav {
-  padding: 12px 16px;
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   flex: 1;
 }
 
 .nav-section {
-  display: none;
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  padding: 12px 12px 4px 12px;
 }
 
 .sidebar-nav a {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  color: #9CA3AF;
-  border-radius: 12px;
-  font-size: 14px;
+  gap: 10px;
+  padding: 9px 12px;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  font-size: 13px;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.15s ease;
 }
 
 .sidebar-nav a:hover {
-  background-color: transparent;
-  color: #FFFFFF;
+  background-color: var(--bg-sidebar-hover);
+  color: var(--text-primary);
 }
 
 .sidebar-nav a.active {
-  background-color: #373843;
-  color: #FFFFFF;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  font-weight: 600;
 }
 
 .sidebar-nav a.active::before {
@@ -144,11 +153,12 @@ button {
 }
 
 .sidebar-footer {
-  padding: 20px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: var(--bg-sidebar);
 }
 
 .user-info-mini {
@@ -159,16 +169,16 @@ button {
 .user-info-mini .name {
   font-size: 13px;
   font-weight: 600;
-  color: #FFFFFF;
+  color: var(--text-primary);
 }
 
 .user-info-mini .role {
-  font-size: 12px;
-  color: #6B7280;
+  font-size: 11px;
+  color: var(--text-muted);
 }
 
 .btn-signout-icon {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   padding: 4px;
   border-radius: var(--radius-sm);
   display: flex;
@@ -178,8 +188,8 @@ button {
 }
 
 .btn-signout-icon:hover {
-  color: #FFFFFF;
-  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  background-color: var(--bg-sidebar-hover);
 }
 
 /* Main Content Area */
@@ -275,17 +285,19 @@ button {
   color: var(--text-secondary);
 }
 
-/* Cards */
+/* Cards - Reference Flat ERP Style */
 .card {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 16px;
+  background-color: #FFFFFF;
+  border: 1px solid #ECEAE5;
+  border-radius: 10px;
+  padding: 18px 20px;
+  box-shadow: none;
 }
 
 .card-header {
-  font-size: var(--font-size-section);
+  font-size: 14px;
   font-weight: 600;
+  color: var(--text-primary);
   margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
@@ -514,39 +526,43 @@ tbody tr:hover {
   margin-top: 2px;
 }
 
-/* KPI Strip */
+/* KPI Strip - Reference 4-Column Grid */
 .kpi-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
 .kpi-card {
-  padding: 16px;
-  height: 84px;
+  background: #FFFFFF;
+  border: 1px solid #ECEAE5;
+  border-radius: 10px;
+  padding: 18px 20px;
+  height: auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .kpi-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 10px;
 }
 
 .kpi-label {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
   font-weight: 500;
 }
 
 .kpi-value {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: -0.5px;
 }
 
 /* Toolbar */

@@ -8,12 +8,13 @@ import challanRoutes from './routes/challan.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import notificationRoutes from './routes/notification.routes';
 import searchRoutes from './routes/search.routes';
+import userRoutes from './routes/user.routes';
 
 const app: express.Express = express();
 const PORT = process.env.PORT || 5000;
 
 // ── Middleware ──────────────────────────────────────────
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', 'http://localhost:3000'];
 if (process.env.FRONTEND_URL) {
   const envOrigins = process.env.FRONTEND_URL.split(',').map(url => url.trim());
   allowedOrigins.push(...envOrigins);
@@ -48,6 +49,7 @@ app.use('/challans', challanRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/notifications', notificationRoutes);
 app.use('/search', searchRoutes);
+app.use('/users', userRoutes);
 
 // ── 404 Handler ─────────────────────────────────────────
 app.use((_req, res) => {

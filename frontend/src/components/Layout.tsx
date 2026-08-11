@@ -153,8 +153,8 @@ const Layout: React.FC = () => {
       {/* Sidebar Navigation */}
       <aside className="sidebar">
         <div className="sidebar-header">
-          <div style={{ background: '#A78BFA', padding: '6px', borderRadius: '8px', display: 'flex' }}>
-            <Box size={18} style={{ color: '#FFFFFF' }} />
+          <div style={{ background: 'var(--primary)', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box size={16} style={{ color: '#FFFFFF' }} />
           </div>
           <h2>MiniERP</h2>
         </div>
@@ -167,12 +167,10 @@ const Layout: React.FC = () => {
         </nav>
 
         <div className="sidebar-footer">
-          <img 
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=374151&color=fff&size=40`} 
-            alt={user.name} 
-            style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0 }}
-          />
-          <div className="user-info-mini" style={{ marginLeft: '12px', flex: 1, overflow: 'hidden' }}>
+          <div className="avatar-initial" style={{ width: '32px', height: '32px', background: 'var(--primary)', color: 'white', border: 'none', fontSize: '13px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="user-info-mini" style={{ marginLeft: '10px', flex: 1, overflow: 'hidden' }}>
             <span className="name">{user.name}</span>
             <span className="role">{user.role.toLowerCase()}@erp.com</span>
           </div>
@@ -185,9 +183,13 @@ const Layout: React.FC = () => {
       {/* Main Content Area */}
       <main className="main-content">
         <header className="top-header">
-          <div className="header-title">{getPageTitle()}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Dashboard</span>
+            <span style={{ color: 'var(--text-muted)' }}>/</span>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{getPageTitle()}</span>
+          </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div className="header-right">
             <GlobalSearch />
             <NotificationBell />
             <div style={{ display: 'flex', alignItems: 'center', paddingLeft: '16px', borderLeft: '1px solid var(--border-color)' }}>
