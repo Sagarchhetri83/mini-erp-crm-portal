@@ -59,6 +59,7 @@ const ChallanDetail: React.FC = () => {
   }, [id]);
 
   const fetchChallan = async () => {
+    setLoading(true);
     try {
       // Assuming the backend doesn't currently return product sku for challan items,
       // the interface supports it gracefully if added.
@@ -77,8 +78,8 @@ const ChallanDetail: React.FC = () => {
     setProcessing(true);
     setActionError('');
     try {
-      const res = await api.post(`/challans/${id}/confirm`);
-      setChallan(res.data);
+      await api.post(`/challans/${id}/confirm`);
+      await fetchChallan();
     } catch (err: any) {
       setActionError(err.response?.data?.error || 'Failed to confirm challan.');
     } finally {
