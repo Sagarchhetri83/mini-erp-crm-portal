@@ -88,9 +88,10 @@ export const GlobalSearch: React.FC = () => {
 
       {isOpen && query.length >= 2 && (
         <div className="search-dropdown" style={{
-          position: 'absolute', top: '40px', right: 0, width: '350px', background: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          zIndex: 100, maxHeight: '400px', overflowY: 'auto'
+          position: 'absolute', top: '40px', right: 0, width: '350px', backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-color)', borderRadius: '8px',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+          zIndex: 9999, maxHeight: '400px', overflowY: 'auto'
         }}>
           {!isLoading && !hasResults && (
             <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>

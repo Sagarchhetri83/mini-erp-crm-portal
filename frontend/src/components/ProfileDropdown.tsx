@@ -50,11 +50,13 @@ export const ProfileDropdown: React.FC = () => {
 
       {isOpen && (
         <div className="profile-dropdown" style={{
-          position: 'absolute', top: '44px', right: 0, width: '240px', background: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          zIndex: 100, overflow: 'hidden'
+          position: 'absolute', top: '44px', right: 0, width: '240px',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-color)', borderRadius: '8px',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+          zIndex: 9999, overflow: 'hidden'
         }}>
-          <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-app)' }}>
+          <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-app)' }}>
             <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>{user.name}</div>
             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>{user.email}</div>
             <div style={{ fontSize: '10px', background: 'var(--primary)', color: 'white', display: 'inline-block', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
@@ -62,7 +64,7 @@ export const ProfileDropdown: React.FC = () => {
             </div>
           </div>
           
-          <div style={{ padding: '8px 0' }}>
+          <div style={{ padding: '8px 0', backgroundColor: 'var(--bg-surface)' }}>
             <button className="dropdown-item" onClick={() => handleNavigate('/profile')} style={{
               width: '100%', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '10px',
               background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer',
@@ -79,7 +81,7 @@ export const ProfileDropdown: React.FC = () => {
             </button>
           </div>
           
-          <div style={{ borderTop: '1px solid var(--border-color)', padding: '8px 0' }}>
+          <div style={{ borderTop: '1px solid var(--border-color)', padding: '8px 0', backgroundColor: 'var(--bg-surface)' }}>
             <button className="dropdown-item" onClick={handleLogout} style={{
               width: '100%', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '10px',
               background: 'none', border: 'none', color: 'var(--danger-color, #EF4444)', fontSize: '13px', cursor: 'pointer',

@@ -74,9 +74,10 @@ export const NotificationBell: React.FC = () => {
 
       {isOpen && (
         <div className="notification-dropdown" style={{
-          position: 'absolute', top: '36px', right: '-10px', width: '320px', background: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          zIndex: 100, display: 'flex', flexDirection: 'column', maxHeight: '450px'
+          position: 'absolute', top: '36px', right: '-10px', width: '320px', backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-color)', borderRadius: '8px',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+          zIndex: 9999, display: 'flex', flexDirection: 'column', maxHeight: '450px'
         }}>
           <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>Notifications</h4>

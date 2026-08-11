@@ -201,7 +201,21 @@ button {
   padding: 0 24px;
   flex-shrink: 0;
   position: relative;
-  z-index: 50;
+  z-index: 1000;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-dropdown,
+.notification-dropdown,
+.search-dropdown {
+  background-color: var(--bg-surface) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  z-index: 9999 !important;
 }
 
 .header-title {
