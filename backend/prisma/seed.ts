@@ -1,4 +1,4 @@
-import { PrismaClient, Role, CustomerType, CustomerStatus, ChallanStatus, StockMovementType } from '@prisma/client';
+import { PrismaClient, Role, UserStatus, CustomerType, CustomerStatus, ChallanStatus, StockMovementType } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -9,10 +9,10 @@ async function main() {
   // 1. Users
   const passwordHash = await bcrypt.hash('Password123', 10);
   const users = [
-    { name: 'Admin User',     email: 'admin@erp.com',     role: Role.ADMIN },
-    { name: 'Sales User',     email: 'sales@erp.com',     role: Role.SALES },
-    { name: 'Warehouse User', email: 'warehouse@erp.com', role: Role.WAREHOUSE },
-    { name: 'Accounts User',  email: 'accounts@erp.com',  role: Role.ACCOUNTS },
+    { name: 'Admin User',     email: 'admin@erp.com',     role: Role.ADMIN, status: UserStatus.ACTIVE },
+    { name: 'Sales User',     email: 'sales@erp.com',     role: Role.SALES, status: UserStatus.ACTIVE },
+    { name: 'Warehouse User', email: 'warehouse@erp.com', role: Role.WAREHOUSE, status: UserStatus.ACTIVE },
+    { name: 'Accounts User',  email: 'accounts@erp.com',  role: Role.ACCOUNTS, status: UserStatus.ACTIVE },
   ];
 
   let adminUserId = '';
@@ -23,12 +23,14 @@ async function main() {
         name: user.name,
         password: passwordHash,
         role: user.role,
+        status: user.status,
       },
       create: {
         name: user.name,
         email: user.email,
         password: passwordHash,
         role: user.role,
+        status: user.status,
       },
     });
     if (user.role === Role.ADMIN) adminUserId = upserted.id;

@@ -29,11 +29,11 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       ];
     }
 
-    if (role && typeof role === 'string' && Object.values(Role).includes(role as Role)) {
+    if (role && typeof role === 'string' && (Object.values(Role) as string[]).includes(role)) {
       whereClause.role = role as Role;
     }
 
-    if (status && typeof status === 'string' && Object.values(UserStatus).includes(status.toUpperCase() as UserStatus)) {
+    if (status && typeof status === 'string' && (Object.values(UserStatus) as string[]).includes(status.toUpperCase())) {
       whereClause.status = status.toUpperCase() as UserStatus;
     }
 
@@ -117,7 +117,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!Object.values(Role).includes(role)) {
+    if (!(Object.values(Role) as string[]).includes(role)) {
       res.status(400).json({ error: 'Invalid role specified.' });
       return;
     }
@@ -140,7 +140,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         email,
         password: passwordHash,
         role: role as Role,
-        status: status && Object.values(UserStatus).includes(status.toUpperCase()) ? (status.toUpperCase() as UserStatus) : UserStatus.ACTIVE,
+        status: status && (Object.values(UserStatus) as string[]).includes(status.toUpperCase()) ? (status.toUpperCase() as UserStatus) : UserStatus.ACTIVE,
       },
       select: {
         id: true,
@@ -195,8 +195,8 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
       data: {
         ...(name && { name }),
         ...(email && { email }),
-        ...(role && Object.values(Role).includes(role) && { role: role as Role }),
-        ...(status && Object.values(UserStatus).includes(status.toUpperCase()) && { status: status.toUpperCase() as UserStatus }),
+        ...(role && (Object.values(Role) as string[]).includes(role) && { role: role as Role }),
+        ...(status && (Object.values(UserStatus) as string[]).includes(status.toUpperCase()) && { status: status.toUpperCase() as UserStatus }),
       },
       select: {
         id: true,
