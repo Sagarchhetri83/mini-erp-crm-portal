@@ -58,7 +58,7 @@ router.post('/', requireRole('ADMIN', 'SALES'), async (req: Request, res: Respon
         return;
       }
       
-      const qty = parseInt(item.qty);
+      const qty = parseInt(item.quantity);
       if (isNaN(qty) || qty <= 0) {
         res.status(400).json({ error: `Invalid quantity for product ${product.name}.` });
         return;
@@ -155,7 +155,13 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     const challan = await prisma.challan.findUnique({
       where: { id },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: {
+              select: { sku: true, stock: true }
+            }
+          }
+        },
         customer: true,
         createdBy: { select: { name: true } },
       },

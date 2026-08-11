@@ -13,6 +13,7 @@ interface ChallanItem {
   lineTotal: number;
   product?: {
     sku: string;
+    stock: number;
   };
 }
 
@@ -108,6 +109,9 @@ const ChallanDetail: React.FC = () => {
 
   const isDraft = challan.status === 'DRAFT';
 
+  const insufficientItems = challan.items.filter(item => item.product && item.qty > item.product.stock);
+  const hasInsufficientStock = insufficientItems.length > 0;
+
   const getStatusBadge = (status: string) => {
     return <span className={`badge badge-${status.toLowerCase()}`}>{status}</span>;
   };
@@ -187,36 +191,72 @@ const ChallanDetail: React.FC = () => {
 
             {/* Action Buttons for DRAFT status */}
             {isDraft && (
-              <div className="card" style={{ background: '#FEFBF4', border: '1px solid var(--warning-bg)', display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div>
-                  <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#B45309' }}>
-                    <AlertTriangle size={14} /> Action Required
-                  </h4>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#92400E' }}>
-                    Confirming this draft will permanently deduct stock from inventory.
-                  </p>
-                </div>
-                <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
-                  {canCancel && (
-                    <button 
-                      className="btn btn-secondary" 
-                      style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}
-                      onClick={handleCancel}
-                      disabled={processing}
-                    >
-                      <XCircle size={14} /> {processing ? 'Processing...' : 'Cancel'}
-                    </button>
-                  )}
-                  {canConfirm && (
-                    <button 
-                      className="btn btn-primary" 
-                      onClick={handleConfirm}
-                      disabled={processing}
-                      style={{ background: 'var(--success)' }}
-                    >
-                      <CheckCircle size={14} /> {processing ? 'Processing...' : 'Confirm & Deduct Stock'}
-                    </button>
-                  )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {hasInsufficientStock && (
+                  <div className="card" style={{ background: '#FEF2F2', border: '1px solid var(--danger)', padding: '16px' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#991B1B' }}>
+                      <AlertTriangle size={14} /> Insufficient Stock Warning
+                    </h4>
+                    <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#7F1D1D' }}>
+                      Some items in this draft exceed available stock. You cannot confirm this challan until stock is replenished.
+                    </p>
+                    <table style={{ width: '100%', fontSize: '13px', color: '#7F1D1D', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid #FECACA' }}>
+                          <th style={{ textAlign: 'left', padding: '4px 0' }}>Product</th>
+                          <th style={{ textAlign: 'right', padding: '4px 0' }}>Required</th>
+                          <th style={{ textAlign: 'right', padding: '4px 0' }}>Available</th>
+                          <th style={{ textAlign: 'right', padding: '4px 0' }}>Shortage</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {insufficientItems.map(item => (
+                          <tr key={item.id}>
+                            <td style={{ padding: '4px 0' }}>{item.productName}</td>
+                            <td style={{ textAlign: 'right', padding: '4px 0' }}>{item.qty}</td>
+                            <td style={{ textAlign: 'right', padding: '4px 0' }}>{item.product?.stock || 0}</td>
+                            <td style={{ textAlign: 'right', padding: '4px 0', fontWeight: 'bold' }}>{item.qty - (item.product?.stock || 0)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                <div className="card" style={{ background: '#FEFBF4', border: '1px solid var(--warning-bg)', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#B45309' }}>
+                      <AlertTriangle size={14} /> Action Required
+                    </h4>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#92400E' }}>
+                      Confirming this draft will permanently deduct stock from inventory.
+                    </p>
+                  </div>
+                  <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px' }}>
+                    {canCancel && (
+                      <button 
+                        className="btn btn-secondary" 
+                        style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}
+                        onClick={handleCancel}
+                        disabled={processing}
+                      >
+                        <XCircle size={14} /> {processing ? 'Processing...' : 'Cancel'}
+                      </button>
+                    )}
+                    {canConfirm && (
+                      <button 
+                        className="btn btn-primary" 
+                        onClick={handleConfirm}
+                        disabled={processing || hasInsufficientStock}
+                        style={{ 
+                          background: (processing || hasInsufficientStock) ? 'var(--text-muted)' : 'var(--success)',
+                          cursor: (processing || hasInsufficientStock) ? 'not-allowed' : 'pointer',
+                          opacity: (processing || hasInsufficientStock) ? 0.6 : 1
+                        }}
+                      >
+                        <CheckCircle size={14} /> {processing ? 'Processing...' : 'Confirm & Deduct Stock'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
