@@ -35,24 +35,32 @@ async function run() {
     const token = loginRes.token;
     const headers = { 'Authorization': `Bearer ${token}` };
 
+    const customersRes = await request(`${BASE_URL}/customers?limit=100`, { headers });
+    const customers = customersRes.data;
+
     const challansRes = await request(`${BASE_URL}/challans?limit=100`, { headers });
     const challans = challansRes.data;
 
-    const remainingChallanNumbers = challans.map(c => c.challanNo).sort();
-    
-    const chl16 = challans.find(c => c.challanNo === 'CHL-2026-0016');
-    const chl17 = challans.find(c => c.challanNo === 'CHL-2026-0017');
+    const report = [];
 
-    const productsRes = await request(`${BASE_URL}/products?limit=100`, { headers });
-    const products = productsRes.data.map(p => ({ sku: p.sku, stock: p.stock }));
+    // Filter target customers
+    for (const c of customers) {
+      if (c.name.includes('Postman Test Customer')) {
+        const customerChallans = challans.filter(ch => ch.customerId === c.id);
+        
+        report.push({
+          id: c.id,
+          name: c.name,
+          email: c.email,
+          mobile: c.mobile,
+          businessName: c.businessName,
+          referencedByChallansCount: customerChallans.length,
+          referencedByChallans: customerChallans.map(ch => ch.challanNo)
+        });
+      }
+    }
 
-    console.log(JSON.stringify({
-      remainingChallanCount: challans.length,
-      remainingChallanNumbers,
-      chl16ExistsAsCancelled: chl16 ? chl16.status === 'CANCELLED' : false,
-      chl17ExistsAsConfirmed: chl17 ? chl17.status === 'CONFIRMED' : false,
-      sampleProductsStock: products.slice(0, 5)
-    }, null, 2));
+    console.log(JSON.stringify(report, null, 2));
 
   } catch (err) {
     console.error('Error:', err.message);
