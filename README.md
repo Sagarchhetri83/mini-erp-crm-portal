@@ -4,8 +4,6 @@
 
 A full-stack ERP and CRM platform for managing customers, products, inventory, sales challans, and role-based business operations.
 
-Fundsroom provided the business requirements for a centralized operations portal. I designed and developed the application as a full-stack system with a React frontend, Node.js/Express API, PostgreSQL database, JWT-based authentication, role-based access control, and production deployment through Vercel and Railway.
-
 ## Project Links
 
 [Live Application](https://mini-erp-crm-portal-vert.vercel.app/) ·
