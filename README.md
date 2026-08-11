@@ -1,111 +1,166 @@
 # Mini ERP + CRM Operations Portal
 
-A modern, full-stack Business-to-Business (B2B) Enterprise Resource Planning (ERP) and Customer Relationship Management (CRM) application. Designed for small-to-medium Indian distributors, wholesalers, and electronics retailers, this portal centralizes inventory management, sales challans, and customer follow-ups into a unified, premium SaaS dashboard.
-
----
-
 ## 1. Project Overview
+The Mini ERP + CRM Operations Portal is a modern, full-stack Business-to-Business (B2B) Enterprise Resource Planning (ERP) and Customer Relationship Management (CRM) application. It is designed to solve operational bottlenecks for businesses by providing centralized real-time inventory tracking, role-based access control, customer management, and sales challans (invoicing) within a unified, premium SaaS dashboard.
 
-The **Mini ERP + CRM** is built to solve operational bottlenecks for trading businesses by providing real-time inventory tracking, role-based access control, and dynamic CRM capabilities. The platform strictly enforces business rules (e.g., atomic stock deductions upon challan confirmation) and visualizes data through a comprehensive analytics dashboard.
+## 2. Assignment Coverage
 
-## 2. Core Features
+| Requirement | Implementation Status |
+| :--- | :--- |
+| Authentication & Roles | Completed |
+| Customer CRM | Completed |
+| Product & Inventory | Completed |
+| Sales Challan | Completed |
+| REST APIs | Completed |
+| React Frontend | Completed |
+| Deployment | Completed |
+| Postman Testing | Completed |
+| Documentation | Completed |
 
-- **Role-Based Access Control (RBAC):** Distinct workspaces and permissions for `ADMIN`, `SALES`, `WAREHOUSE`, and `ACCOUNTS`.
-- **Customer CRM:** Manage Retail, Wholesale, and Distributor clients with lead tracking and follow-up scheduling.
-- **Inventory & Stock Management:** Track IN/OUT stock movements, low-stock alerts, and minimum stock enforcement.
-- **Sales Challans (Invoicing):** Create Draft challans and Confirm them to automatically and atomically deduct inventory.
-- **Business Analytics:** Real-time metrics, dynamic CSS distribution bars, and recent activity feeds.
-- **Global Search & Notifications:** Instantly search across customers, products, and challans. Receive real-time alerts for low stock.
-- **Printable Documents:** Generate professional, A4-formatted printable challans natively from the browser.
+## 3. Core Features
+- **JWT authentication:** Secure, stateless login using JSON Web Tokens.
+- **RBAC (Role-Based Access Control):** Dedicated views and protected routes for ADMIN, SALES, WAREHOUSE, and ACCOUNTS roles.
+- **Customer CRM:** Manage retail, wholesale, and distributor clients with lead status tracking and detailed billing info.
+- **Product & Inventory Management:** Full CRUD for inventory including minimum stock thresholds and SKUs.
+- **Stock Movement:** Complete logging of IN and OUT stock movements with timestamps and reasons.
+- **Sales Challans:** End-to-end sales workflow for creating, viewing, and confirming challans.
+- **Automatic Challan Numbering:** Auto-generating sequential document numbers (e.g., CHL-YYYY-0001).
+- **Draft/Confirmed Workflow:** Challans begin as drafts, allowing for edits or cancellations before finalization.
+- **Stock Deduction:** Atomic stock deductions strictly upon confirmation of a draft challan.
+- **Insufficient Stock Protection:** Prevents confirming challans if the required quantities exceed available stock.
+- **Search:** Global search capabilities across customers, products, and challan records.
+- **Analytics/Dashboard:** Role-based analytics screens detailing performance, recent activities, and key metrics.
+- **Notifications:** In-app notification system to alert users of low stock and challan state changes.
 
-## 3. Tech Stack
+## 4. Bonus Features
+- **PDF/Printable Document Generation (OPTIONAL/BONUS):** Native capability to generate professional, A4-formatted printable invoices/challans directly from the browser for physical distribution or saving as PDF.
 
-- **Frontend:** React 18, Vite, TypeScript, React Router, Tailwind-inspired custom Vanilla CSS, Axios
-- **Backend:** Node.js, Express.js, TypeScript, JSON Web Tokens (JWT), bcrypt
-- **Database & ORM:** PostgreSQL, Prisma ORM
-- **Hosting / Deployment:** Vercel (Frontend), Railway (Backend API & Managed PostgreSQL)
+## 5. Tech Stack
 
-## 4. Architecture
+**Frontend:**
+- React
+- Vite
+- TypeScript
+- React Router
+- Axios
+- Custom Vanilla CSS (Tailwind-inspired utility classes)
+
+**Backend:**
+- Node.js
+- Express.js
+- TypeScript
+- JWT
+- bcrypt
+- Prisma
+
+**Database:**
+- PostgreSQL
+
+**Deployment:**
+- Vercel (Frontend)
+- Railway (Backend API & PostgreSQL Database)
+
+## 6. Architecture
 
 ```text
-GitHub Repository
-       ↓
-Railway Managed PostgreSQL Database (Production Data)
-       ↓
-Railway Node.js API (Express, Prisma, JWT Auth, CORS configured)
-       ↓
-Vercel Frontend (React SPA, Vite, React Router Rewrites)
+GitHub
+↓
+Railway PostgreSQL
+↓
+Railway Express API
+↓
+Vercel React Frontend
 ```
 
-## 5. Folder Structure
+- **Frontend (Vercel):** A React Single Page Application (SPA) responsible for rendering the UI, managing client-side routing, and securely storing the JWT token.
+- **Backend (Railway):** A Node.js/Express REST API responsible for handling business logic, validating payloads, enforcing Role-Based Access Control, and orchestrating database transactions.
+- **Database (Railway PostgreSQL):** The persistent storage layer holding structured relational data.
+- **Prisma (ORM):** Bridges the Express API and PostgreSQL, providing type-safe database queries, schema migrations, and transaction management.
+
+## 7. Project Structure
 
 ```text
-/
-├── frontend/                  # React + Vite application
-│   ├── src/
-│   │   ├── components/        # Reusable UI components (Sidebar, Header, etc.)
-│   │   ├── context/           # AuthContext (JWT state management)
-│   │   ├── lib/               # api.ts (Axios configuration)
-│   │   ├── pages/             # Route-based views (Dashboard, Customers, etc.)
-│   │   └── App.tsx            # React Router setup
-│   └── vercel.json            # Vercel SPA routing configuration
-│
-└── backend/                   # Node.js + Express + Prisma API
-    ├── prisma/
-    │   ├── schema.prisma      # PostgreSQL Database Schema
-    │   ├── seed.ts            # Idempotent Indian demo data seeder
-    │   └── migrations/        # Production migration history
-    └── src/
-        ├── middleware/        # JWT & RBAC validation
-        ├── routes/            # Express route controllers
-        └── index.ts           # Server entry point
+frontend/                            # React + Vite application
+backend/                             # Node.js + Express + Prisma API
+mini_erp_postman_collection.json     # 53-test Postman API testing suite
+README.md                            # Project documentation
 ```
 
-## 6. Prisma / PostgreSQL Schema
+## 8. Database Design
 
-- **Users:** `id`, `name`, `email`, `password`, `role`
-- **Customers:** `id`, `name`, `mobile`, `customerType`, `status`, `address`, `gstNumber`
-- **Products:** `id`, `name`, `sku`, `price`, `stock`, `minStock`, `category`
-- **Challans & Items:** `challanNo`, `status`, `totalAmount`, linked to `Customer` and `Product`
-- **Stock Movements:** Log of every `IN` and `OUT` transaction.
+The application utilizes a relational database with the following Prisma models:
+- **Users:** Stores authentication credentials, roles, and statuses.
+- **Customers:** Manages client details, lead status, business names, and GST info.
+- **Products:** Stores inventory catalog, SKUs, pricing, and current stock levels.
+- **Challans:** The parent invoice records holding statuses, totals, and customer references.
+- **Challan Items:** The child line-items storing product snapshots (names, prices) and quantities.
+- **Stock Movements:** An append-only ledger tracking all IN and OUT inventory changes.
+- **Notifications:** In-app alerts for system events directed at specific users.
 
-## 7. Authentication & Security
+## 9. Authentication & RBAC
 
-- Stateless authentication using securely signed **JSON Web Tokens (JWT)**.
-- Passwords hashed using **bcrypt** (10 salt rounds).
-- Global API intercepts automatically log users out if a `401 Unauthorized` is detected.
-- `FRONTEND_URL` CORS protection ensures the backend only accepts requests from trusted domains.
+| Role | Main Access |
+| :--- | :--- |
+| **ADMIN** | Full system access: Analytics, Customers, Inventory, Challans, User Management. |
+| **SALES** | Manage Customers, Create Draft Challans, Confirm Challans. |
+| **WAREHOUSE** | View Inventory, Add Stock, Log Stock Movements. |
+| **ACCOUNTS** | View Analytics, View Financials, View Challans. |
 
-## 8. Role-Based Access Control (RBAC) Matrix
+## 10. Business Rules
 
-| Feature | ADMIN | SALES | WAREHOUSE | ACCOUNTS |
-| :--- | :---: | :---: | :---: | :---: |
-| **Analytics Dashboard** | ✅ | ❌ | ❌ | ❌ |
-| **Manage Customers** | ✅ | ✅ | ❌ | ❌ |
-| **Manage Inventory** | ✅ | ❌ | ✅ | ❌ |
-| **Create Challans** | ✅ | ✅ | ❌ | ❌ |
-| **View Financials** | ✅ | ❌ | ❌ | ✅ |
+- **Draft challans do not reduce stock:** Drafts act as pending orders and do not impact available inventory.
+- **Confirmed challans reduce stock:** Confirming a challan initiates an atomic transaction that deducts inventory and writes to the stock movement ledger permanently.
+- **Stock cannot become negative:** The system explicitly prevents operations that would drop inventory below zero.
+- **Insufficient stock returns an appropriate error:** The backend validates stock levels, and the frontend visually disables the confirmation button while displaying shortage warnings.
+- **Product snapshot is stored in challan items:** The product name and price at the time of order creation are copied into the `ChallanItem` to preserve historical integrity even if the master product is later modified.
+- **Automatic challan number generation:** Sequential, conflict-free numbering.
 
-## 9. Business Rules & Logic
+## 11. API Overview
 
-1. **Atomic Stock Deductions:** A challan in `DRAFT` status does not affect inventory. When a challan is `CONFIRMED`, the exact quantity of products is atomically deducted from the `products` table, and an `OUT` record is written to the `stock_movements` table.
-2. **Insufficient Stock Protection:** If a user attempts to confirm a challan that requires more stock than currently available, the backend rejects the transaction, preventing negative stock.
-3. **Idempotent Seeding:** Running the database seed script uses `upsert` and unique keys (e.g., SKU, ChallanNo, Email) to ensure no duplicate records are ever created during server restarts.
+The REST API implements standard HTTP verbs with proper status codes. Key endpoints include:
 
----
+- `POST /auth/login` - Authenticate and receive JWT
+- `GET /users` - List system users (Admin only)
+- `GET /customers` - List customers with search/pagination
+- `POST /customers` - Create a new customer
+- `GET /products` - List inventory products
+- `POST /products` - Create a new product
+- `GET /challans` - List sales challans
+- `POST /challans` - Create a new DRAFT challan
+- `GET /challans/:id` - Get specific challan details
+- `POST /challans/:id/confirm` - Finalize challan and deduct stock
+- `DELETE /challans/:id` - Cancel a DRAFT challan
+- `GET /analytics/:role` - Fetch role-specific dashboard metrics
 
-## 10. Local Development Setup
+## 12. Postman API Testing
 
-### Requirements
-- Node.js (v18+)
-- PostgreSQL (running locally on port 5432/5433)
+### Test Result
+- **53 total tests**
+- **53 passed**
+- **0 failed**
+- **0 errors**
+- **0 skipped**
+
+The comprehensive Postman collection covers:
+- Authentication & Authorization validation
+- Customers CRUD operations
+- Products & Inventory management
+- Sales Challans workflows
+- Users & RBAC enforcement
+- Negative tests (e.g., unauthorized access, invalid payloads)
+- Insufficient stock transaction rejections
+
+The test suite is included in the root directory: `mini_erp_postman_collection.json`.
+
+## 13. Local Development Setup
 
 ### Backend
 ```bash
 cd backend
 npm install
-# Configure your local .env file
+# Configure your local .env file based on .env.example
 npx prisma migrate dev
+npm run seed
 npm run dev
 ```
 
@@ -113,64 +168,85 @@ npm run dev
 ```bash
 cd frontend
 npm install
-# Configure your local .env file
+# Configure your local .env file based on .env.example
 npm run dev
 ```
 
-## 11. Environment Variables
+## 14. Environment Variables
 
-**`backend/.env`**
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/mini_erp"
-JWT_SECRET="your-secure-random-secret"
-PORT=5000
-FRONTEND_URL="http://localhost:5173"
-```
+*Note: Create `.env` files locally. Never commit secrets to version control.*
 
-**`frontend/.env`**
-```env
-VITE_API_URL="http://localhost:5000"
-```
+**Backend:**
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `PORT`
+- `FRONTEND_URL`
 
-## 12. Production Deployment
+**Frontend:**
+- `VITE_API_URL`
 
-### Database Migrations
-**DO NOT** use `npx prisma db push` in production.
-The backend startup sequence is explicitly defined in `package.json` to handle safe migrations automatically:
-```json
-"start": "npx prisma migrate deploy && npm run seed && node dist/index.js"
-```
-This guarantees the Railway database tables are generated and seeded before the API listens for traffic.
+## 15. Production Deployment
 
-### Railway (Backend & Database)
+### Backend & Database (Railway)
 1. Provision a PostgreSQL instance on Railway.
-2. Deploy the `backend/` folder to a Railway Node.js service.
-3. Set the environment variables (`DATABASE_URL`, `JWT_SECRET`, `PORT`, `FRONTEND_URL`).
-4. The deployment will automatically run `npm run build` followed by the safe `start` script.
+2. Deploy the `backend/` directory to a Railway Node.js service.
+3. Supply the environment variables in Railway's dashboard.
+4. The deployment process automatically runs `npm run build`.
+5. The explicit start command `npx prisma migrate deploy && npm run seed && node dist/index.js` guarantees that migrations are applied and the database is seeded before the server listens.
 
-### Vercel (Frontend)
-1. Import the `frontend/` folder into Vercel.
-2. Framework: **Vite**.
-3. Build Command: `npm run build` | Output Directory: `dist`
-4. Set the `VITE_API_URL` environment variable to your Railway domain.
-5. The included `vercel.json` ensures React Router SPA refresh behaviors work flawlessly.
+### Frontend (Vercel)
+1. Import the `frontend/` directory into Vercel.
+2. Select **Vite** as the framework.
+3. Build command: `tsc -b && vite build`.
+4. Output directory: `dist`.
+5. Provide the `VITE_API_URL` environment variable pointing to the backend.
+6. The `vercel.json` file ensures that React Router Single Page Application (SPA) routing resolves correctly.
 
-## 13. Production URLs & Test Credentials
+## 16. Production URLs
 
-**Backend API:** `https://mini-erp-crm-portal-production.up.railway.app`
-*(Frontend URL provided by Vercel)*
+- **Backend:** https://mini-erp-crm-portal-production.up.railway.app
+- **Frontend:** https://mini-erp-crm-portal-vert.vercel.app
 
-**Demo Accounts (Password for all: `Password123`):**
-- `admin@erp.com`
-- `sales@erp.com`
-- `warehouse@erp.com`
-- `accounts@erp.com`
+## 17. Demo Credentials
 
-## 14. API Collection & Postman
-A Postman collection is maintained alongside this repository. Ensure `baseUrl` is set to the Railway production URL when testing endpoints externally. All endpoints (except `/auth/login`) require the `Authorization: Bearer <token>` header.
+*(Note: The following are DEMO credentials populated by the database seeder.)*
 
-## 15. Known Limitations & Future Improvements
-- **No File Uploads:** Product images and manual document attachments are currently unsupported.
-- **Email Notifications:** Follow-up and low-stock notifications are natively handled in the UI via polling; SMTP email alerts are a future enhancement.
-- **Multi-currency:** All calculations and reports are hardcoded to Indian Rupees (₹). 
-- **Pagination:** Stock movement history currently fetches the latest 50-100 records natively without strict cursor-based pagination.
+- admin@erp.com
+- sales@erp.com
+- warehouse@erp.com
+- accounts@erp.com
+
+**Password for all demo accounts:** `Password123`
+
+## 18. Known Limitations
+
+- No product image uploads natively integrated.
+- No email notifications; all alerts are managed via the in-app polling UI.
+- All monetary values and calculations are fixed to Indian Rupees (INR).
+- Limited stock movement pagination (currently fetches a fixed batch of recent records).
+
+## 19. Assignment Submission Checklist
+
+- [x] GitHub repository
+- [x] Backend deployed
+- [x] Frontend deployed
+- [x] PostgreSQL database
+- [x] Authentication
+- [x] RBAC
+- [x] Customer CRM
+- [x] Product & Inventory
+- [x] Sales Challan
+- [x] Postman collection
+- [x] API testing
+- [x] README
+- [ ] Screen recording
+- [ ] Final submission
+
+## 20. Future Improvements
+
+- Docker containerization for standardized local setups
+- GitHub Actions for CI/CD pipelines
+- S3 integration for product images and attachments
+- SMTP Email notifications for customer follow-ups and invoices
+- Advanced cursor-based pagination across all data grids
+- Enhanced Invoice PDF exports utilizing server-side PDF generation libraries
