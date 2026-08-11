@@ -37,6 +37,13 @@ app.use(cors({
 app.use(express.json());
 
 // ── Health Check ────────────────────────────────────────
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    name: 'Mini ERP + CRM API',
+    status: 'running'
+  });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
