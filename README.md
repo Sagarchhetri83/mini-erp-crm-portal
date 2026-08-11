@@ -1,4 +1,6 @@
-# Mini ERP + CRM Operations Portal
+<img width="1869" height="926" alt="image" src="https://github.com/user-attachments/assets/b78fb35d-c939-4a54-aee1-d1a29785c70b" />
+
+## Mini ERP + CRM Operations Portal
 
 A full-stack ERP and CRM platform for managing customers, products, inventory, sales challans, and role-based business operations.
 
@@ -400,15 +402,14 @@ The CI workflow automatically validates code integrity on pushes and pull reques
 
 The workflow runs on `ubuntu-latest` against Node 20. It triggers parallel jobs for the frontend and backend. Both jobs execute `npm ci` to cleanly install dependencies, followed by type checking and build commands. The frontend job additionally runs linting checks. The workflow acts strictly as a validation pipeline and does not deploy the application. 
 
-### GitHub Actions
-![GitHub Actions](docs/screenshots/github-actions.png)
 
 ## 19. PostgreSQL + Prisma
 
 The application utilizes PostgreSQL as its relational database. Prisma maps the relational model into type-safe JavaScript objects. The `schema.prisma` file defines all models, relationships, and enums. Migrations track schema changes, and a seed file populates initial development data. The backend explicitly leverages Prisma `$transaction` blocks to ensure data integrity during complex multi-table writes.
 
-### PostgreSQL
-![PostgreSQL Database](docs/screenshots/postgresql.png)
+### PostgreSQL Local
+<img width="1916" height="1014" alt="image" src="https://github.com/user-attachments/assets/3a8d0c69-98ad-4a7c-9476-b1778f76d07e" />
+
 
 ## 20. Railway Deployment
 
@@ -419,10 +420,15 @@ Railway provisions a managed PostgreSQL service on an internal network. The Node
 Production backend: [https://mini-erp-crm-portal-production.up.railway.app](https://mini-erp-crm-portal-production.up.railway.app)
 
 ### Railway Backend
-![Railway Backend](docs/screenshots/railway-backend.png)
+<img width="1864" height="920" alt="image" src="https://github.com/user-attachments/assets/ae94c9e3-446e-445e-8d7a-9337caad7ae6" />
+
 
 ### Railway PostgreSQL
-![Railway PostgreSQL](docs/screenshots/railway-postgresql.png)
+<img width="1867" height="918" alt="image" src="https://github.com/user-attachments/assets/fc7b124c-d9c1-484a-80aa-b6e3099a73c8" />
+
+<img width="1853" height="913" alt="image" src="https://github.com/user-attachments/assets/c77d95e3-4ba4-40d6-8936-c211e613279d" />
+
+
 
 ## 21. Vercel Deployment
 
@@ -433,7 +439,8 @@ Vercel builds the `frontend` root using Vite, outputting static files to the `di
 Production frontend: [https://mini-erp-crm-portal-vert.vercel.app](https://mini-erp-crm-portal-vert.vercel.app)
 
 ### Vercel Deployment
-![Vercel Deployment](docs/screenshots/vercel-deployment.png)
+<img width="1783" height="911" alt="image" src="https://github.com/user-attachments/assets/5a395e43-dfa2-4856-b694-53b029ad3b50" />
+
 
 ## 22. Environment Variables
 
@@ -483,34 +490,36 @@ Code is pushed by the developer to GitHub. GitHub Actions intercepts the push to
 ## 25. Screenshots
 
 ### Login
-![Login](docs/screenshots/login.png)
+<img width="717" height="872" alt="image" src="https://github.com/user-attachments/assets/3481fb16-c4a9-42c2-8481-1f3ce96b696d" />
+
 
 ### Dashboard
-![Dashboard](docs/screenshots/dashboard.png)
+<img width="1860" height="911" alt="image" src="https://github.com/user-attachments/assets/59870be8-39d1-4b58-abb2-2c0f7e524e30" />
+
 
 ### Analytics
-![Analytics](docs/screenshots/analytics.png)
+<img width="1860" height="913" alt="image" src="https://github.com/user-attachments/assets/6295ac1e-681d-4697-8e78-c2960979bbf4" />
 
-### Customer CRM
-![Customer CRM](docs/screenshots/customers.png)
 
 ### Customer Details
-![Customer Details](docs/screenshots/customer-details.png)
+<img width="1860" height="910" alt="image" src="https://github.com/user-attachments/assets/4c545a0a-d61f-4c23-8c5b-ab455f011b9c" />
+
 
 ### Products
-![Products](docs/screenshots/products.png)
+<img width="1859" height="921" alt="image" src="https://github.com/user-attachments/assets/5c165001-d042-4895-9d24-b17f862477c0" />
 
-### Stock Movements
-![Stock Movements](docs/screenshots/stock-movements.png)
 
 ### Sales Challans
-![Sales Challans](docs/screenshots/challans.png)
+<img width="1846" height="914" alt="image" src="https://github.com/user-attachments/assets/43ba0b73-e8eb-4a1e-b750-3cbc4c50c3f0" />
+
 
 ### Challan Details
-![Challan Details](docs/screenshots/challan-details.png)
+<img width="1854" height="919" alt="image" src="https://github.com/user-attachments/assets/a7460720-a344-421e-acd9-fe2785b404dc" />
+
 
 ### Printable Challan
-![Printable Challan](docs/screenshots/printable-challan.png)
+<img width="1909" height="1079" alt="image" src="https://github.com/user-attachments/assets/47b9350b-c08a-4d51-90c3-e193979892c1" />
+
 
 ## 26. Testing Strategy
 
