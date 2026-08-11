@@ -225,7 +225,15 @@ npm run dev
 - All monetary values and calculations are fixed to Indian Rupees (INR).
 - Limited stock movement pagination (currently fetches a fixed batch of recent records).
 
-## 19. Assignment Submission Checklist
+## 19. GitHub Actions
+
+GitHub Actions is configured for Continuous Integration (CI).
+- Runs automatically on pushes and pull requests to the `main` branch.
+- Frontend and backend builds and type checks are validated via independent, parallel jobs.
+- The workflow does not deploy to production.
+- Production deployment remains handled automatically by Vercel and Railway upon successful merge.
+
+## 20. Assignment Submission Checklist
 
 - [x] GitHub repository
 - [x] Backend deployed
@@ -239,13 +247,13 @@ npm run dev
 - [x] Postman collection
 - [x] API testing
 - [x] README
+- [x] GitHub Actions CI (BONUS)
 - [ ] Screen recording
 - [ ] Final submission
 
-## 20. Future Improvements
+## 21. Future Improvements
 
 - Docker containerization for standardized local setups
-- GitHub Actions for CI/CD pipelines
 - S3 integration for product images and attachments
 - SMTP Email notifications for customer follow-ups and invoices
 - Advanced cursor-based pagination across all data grids
