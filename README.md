@@ -569,3 +569,8 @@ A key challenge involved guaranteeing that confirming a sales challan perfectly 
 **Sagar Chhetri**  
 BTech — Computer Science & Engineering (Cybersecurity)  
 Full-Stack Development · Backend Development · Cybersecurity
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE)
+file for details.
