@@ -14,9 +14,24 @@ const PORT = process.env.PORT || 5000;
 // ── Middleware ──────────────────────────────────────────
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000'];
 if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
+  const envOrigins = process.env.FRONTEND_URL.split(',').map(url => url.trim());
+  allowedOrigins.push(...envOrigins);
 }
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+    if (!origin) return callback(null, true);
+    
+    // Check if the origin is in our allowed list or is a Vercel preview deployment
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // ── Health Check ────────────────────────────────────────
