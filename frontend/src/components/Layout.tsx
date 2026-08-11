@@ -7,27 +7,23 @@ import {
   Package, 
   FileText, 
   Settings, 
-  Search,
-  Bell,
   Box,
   ChartNoAxesCombined,
   UserCircle,
   MoreHorizontal
 } from 'lucide-react';
+import { GlobalSearch } from './GlobalSearch';
+import { NotificationBell } from './NotificationBell';
+import { ProfileDropdown } from './ProfileDropdown';
 
 const Layout: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   if (!user) return null;
 
   const rolePrefix = `/${user.role.toLowerCase()}`;
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login', { replace: true });
-  };
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -180,7 +176,7 @@ const Layout: React.FC = () => {
             <span className="name">{user.name}</span>
             <span className="role">{user.role.toLowerCase()}@erp.com</span>
           </div>
-          <button className="btn-signout-icon" onClick={handleLogout} title="Sign Out">
+          <button className="btn-signout-icon" onClick={() => navigate(`${rolePrefix}/settings`)} title="Settings">
             <MoreHorizontal size={16} />
           </button>
         </div>
@@ -192,16 +188,10 @@ const Layout: React.FC = () => {
           <div className="header-title">{getPageTitle()}</div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <div style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
-              <Search size={16} style={{ cursor: 'pointer' }} />
-            </div>
-            <div style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
-              <Bell size={16} style={{ cursor: 'pointer' }} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingLeft: '16px', borderLeft: '1px solid var(--border-color)' }}>
-              <div className="avatar-initial" style={{ width: '28px', height: '28px', background: 'var(--primary)', color: 'white', border: 'none', fontSize: '11px' }}>
-                {user.name.charAt(0).toUpperCase()}
-              </div>
+            <GlobalSearch />
+            <NotificationBell />
+            <div style={{ display: 'flex', alignItems: 'center', paddingLeft: '16px', borderLeft: '1px solid var(--border-color)' }}>
+              <ProfileDropdown />
             </div>
           </div>
         </header>

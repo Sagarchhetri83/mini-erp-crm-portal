@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useDashboardStats } from '../dashboard/useDashboardStats';
-import { ChartNoAxesCombined, Package, FileText, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { Package, FileText, CheckCircle, Clock, XCircle, Users, Activity, PhoneCall } from 'lucide-react';
 
 const AnalyticsContainer: React.FC = () => {
   const { user } = useAuth();
@@ -11,206 +11,225 @@ const AnalyticsContainer: React.FC = () => {
   if (error) return <div className="alert alert-error">{error}</div>;
   if (!data || !user) return null;
 
-  // We now use exact metrics from the backend, calculated via proper aggregations across all data.
   const { metrics } = data;
   const totalChallans = metrics.totalChallans || 1;
   const confirmedPct = (metrics.statusDistribution.CONFIRMED / totalChallans) * 100;
   const draftPct = (metrics.statusDistribution.DRAFT / totalChallans) * 100;
   const cancelledPct = (metrics.statusDistribution.CANCELLED / totalChallans) * 100;
 
+  const totalProducts = metrics.totalProducts || 1;
+  const inStockPct = ((metrics.inStockCount || 0) / totalProducts) * 100;
+  const lowStockPct = ((metrics.lowStockCount || 0) / totalProducts) * 100;
+  const outOfStockPct = ((metrics.outOfStockCount || 0) / totalProducts) * 100;
+
   const renderAdminAnalytics = () => (
     <>
-      <div className="card" style={{ marginBottom: '24px' }}>
-        <h3 style={{ fontSize: '15px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ChartNoAxesCombined size={16} /> Business Overview
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Customers</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>{data.metrics.totalCustomers}</div>
-          </div>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Products</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>{data.metrics.totalProducts}</div>
-          </div>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Challans</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>{data.metrics.totalChallans}</div>
-          </div>
+      {/* KPI ROW */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <div className="card" style={{ padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Sales (Confirmed)</div>
+          <div style={{ fontSize: '20px', fontWeight: 600 }}>₹{metrics.confirmedSalesValue.toFixed(2)}</div>
+        </div>
+        <div className="card" style={{ padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Confirmed Challans</div>
+          <div style={{ fontSize: '20px', fontWeight: 600 }}>{metrics.confirmedCount}</div>
+        </div>
+        <div className="card" style={{ padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Avg Challan Value</div>
+          <div style={{ fontSize: '20px', fontWeight: 600 }}>₹{metrics.averageChallanValue.toFixed(2)}</div>
+        </div>
+        <div className="card" style={{ padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Customers</div>
+          <div style={{ fontSize: '20px', fontWeight: 600 }}>{metrics.totalCustomers}</div>
+        </div>
+        <div className="card" style={{ padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Products</div>
+          <div style={{ fontSize: '20px', fontWeight: 600 }}>{metrics.totalProducts}</div>
+        </div>
+        <div className="card" style={{ padding: '16px', borderLeft: '3px solid var(--warning)' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Low Stock Items</div>
+          <div style={{ fontSize: '20px', fontWeight: 600 }}>{metrics.lowStockCount}</div>
         </div>
       </div>
-      
+
       <div className="layout-2col">
+        {/* LEFT COLUMN */}
         <div className="layout-main">
+          {/* CHALLAN STATUS */}
           <div className="card">
             <h3 style={{ fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FileText size={16} /> Recent Challans Overview
+              <FileText size={16} /> Challan Status Distribution
             </h3>
             
-            {/* Real CSS Chart based on actual data proportions */}
-            <div style={{ height: '12px', display: 'flex', borderRadius: '6px', overflow: 'hidden', marginBottom: '20px', background: 'var(--border-color)' }}>
-              {metrics.statusDistribution.CONFIRMED > 0 && <div style={{ width: `${confirmedPct}%`, background: 'var(--success)', transition: 'width 0.5s ease' }} title="Confirmed" />}
-              {metrics.statusDistribution.DRAFT > 0 && <div style={{ width: `${draftPct}%`, background: 'var(--warning)', transition: 'width 0.5s ease' }} title="Draft" />}
-              {metrics.statusDistribution.CANCELLED > 0 && <div style={{ width: `${cancelledPct}%`, background: 'var(--danger)', transition: 'width 0.5s ease' }} title="Cancelled" />}
+            <div style={{ height: '16px', display: 'flex', borderRadius: '8px', overflow: 'hidden', marginBottom: '20px', background: 'var(--border-color)' }}>
+              {metrics.statusDistribution.CONFIRMED > 0 && <div style={{ width: `${confirmedPct}%`, background: 'var(--success)', transition: 'width 0.5s ease' }} title={`Confirmed: ${confirmedPct.toFixed(1)}%`} />}
+              {metrics.statusDistribution.DRAFT > 0 && <div style={{ width: `${draftPct}%`, background: 'var(--warning)', transition: 'width 0.5s ease' }} title={`Draft: ${draftPct.toFixed(1)}%`} />}
+              {metrics.statusDistribution.CANCELLED > 0 && <div style={{ width: `${cancelledPct}%`, background: 'var(--danger)', transition: 'width 0.5s ease' }} title={`Cancelled: ${cancelledPct.toFixed(1)}%`} />}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+              <div style={{ flex: 1, padding: '12px', background: 'var(--bg-app)', borderRadius: '8px', textAlign: 'center' }}>
+                <CheckCircle size={16} style={{ color: 'var(--success)', margin: '0 auto 8px' }} />
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Confirmed</div>
+                <div style={{ fontSize: '16px', fontWeight: 600 }}>{metrics.statusDistribution.CONFIRMED}</div>
+              </div>
+              <div style={{ flex: 1, padding: '12px', background: 'var(--bg-app)', borderRadius: '8px', textAlign: 'center' }}>
+                <Clock size={16} style={{ color: 'var(--warning)', margin: '0 auto 8px' }} />
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Draft</div>
+                <div style={{ fontSize: '16px', fontWeight: 600 }}>{metrics.statusDistribution.DRAFT}</div>
+              </div>
+              <div style={{ flex: 1, padding: '12px', background: 'var(--bg-app)', borderRadius: '8px', textAlign: 'center' }}>
+                <XCircle size={16} style={{ color: 'var(--danger)', margin: '0 auto 8px' }} />
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Cancelled</div>
+                <div style={{ fontSize: '16px', fontWeight: 600 }}>{metrics.statusDistribution.CANCELLED}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* CUSTOMER OVERVIEW */}
+          <div className="card">
+            <h3 style={{ fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Users size={16} /> Customer Overview
+            </h3>
+            
+            <div style={{ display: 'flex', gap: '24px' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase' }}>By Type</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span>Retail</span> <span style={{ fontWeight: 600 }}>{metrics.customerTypeDistribution?.RETAIL || 0}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span>Wholesale</span> <span style={{ fontWeight: 600 }}>{metrics.customerTypeDistribution?.WHOLESALE || 0}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span>Distributor</span> <span style={{ fontWeight: 600 }}>{metrics.customerTypeDistribution?.DISTRIBUTOR || 0}</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ width: '1px', background: 'var(--border-color)' }}></div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase' }}>By Status</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)' }}/> Active</span> 
+                    <span style={{ fontWeight: 600 }}>{metrics.customerStatusDistribution?.ACTIVE || 0}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)' }}/> Lead</span> 
+                    <span style={{ fontWeight: 600 }}>{metrics.customerStatusDistribution?.LEAD || 0}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--text-muted)' }}/> Inactive</span> 
+                    <span style={{ fontWeight: 600 }}>{metrics.customerStatusDistribution?.INACTIVE || 0}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* RECENT ACTIVITY */}
+          <div className="card">
+            <h3 style={{ fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Activity size={16} /> Recent Activity
+            </h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {data.recentChallans.slice(0, 3).map(c => (
+                <div key={`c-${c.id}`} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{ padding: '8px', background: 'rgba(91, 92, 226, 0.1)', color: 'var(--primary)', borderRadius: '8px' }}>
+                    <FileText size={16} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 500 }}>Challan {c.status.toLowerCase()}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{c.challanNo} for {c.customer.name}</div>
+                  </div>
+                  <div style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--text-muted)' }}>
+                    {new Date(c.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+              
+              {data.recentMovements.slice(0, 3).map(m => (
+                <div key={`m-${m.id}`} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{ padding: '8px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', borderRadius: '8px' }}>
+                    <Package size={16} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 500 }}>Stock Adjusted ({m.type})</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{m.product.name} ({m.type === 'IN' ? '+' : '-'}{m.qty})</div>
+                  </div>
+                  <div style={{ marginLeft: 'auto', fontSize: '11px', color: 'var(--text-muted)' }}>
+                    {new Date(m.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div className="layout-sidebar">
+          {/* INVENTORY HEALTH */}
+          <div className="card">
+            <h3 style={{ fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Package size={16} /> Inventory Health
+            </h3>
+            
+            <div style={{ height: '8px', display: 'flex', borderRadius: '4px', overflow: 'hidden', marginBottom: '20px', background: 'var(--border-color)' }}>
+              {(metrics.inStockCount || 0) > 0 && <div style={{ width: `${inStockPct}%`, background: 'var(--success)' }} title="In Stock" />}
+              {metrics.lowStockCount > 0 && <div style={{ width: `${lowStockPct}%`, background: 'var(--warning)' }} title="Low Stock" />}
+              {metrics.outOfStockCount > 0 && <div style={{ width: `${outOfStockPct}%`, background: 'var(--danger)' }} title="Out of Stock" />}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <CheckCircle size={14} style={{ color: 'var(--success)' }} /> Confirmed
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)' }}/> In Stock
                 </span>
-                <span style={{ fontWeight: 600 }}>{metrics.statusDistribution.CONFIRMED}</span>
+                <span style={{ fontWeight: 600 }}>{metrics.inStockCount || 0}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Clock size={14} style={{ color: 'var(--warning)' }} /> Draft
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--warning)' }}/> Low Stock
                 </span>
-                <span style={{ fontWeight: 600 }}>{metrics.statusDistribution.DRAFT}</span>
+                <span style={{ fontWeight: 600 }}>{metrics.lowStockCount}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <XCircle size={14} style={{ color: 'var(--danger)' }} /> Cancelled
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--danger)' }}/> Out of Stock
                 </span>
-                <span style={{ fontWeight: 600 }}>{metrics.statusDistribution.CANCELLED}</span>
+                <span style={{ fontWeight: 600 }}>{metrics.outOfStockCount}</span>
               </div>
-            </div>
-            <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
-              *Complete historical distribution of all challans.
             </div>
           </div>
-        </div>
 
-        <div className="layout-sidebar">
+          {/* FOLLOW-UPS */}
           <div className="card">
             <h3 style={{ fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Package size={16} /> Inventory Health
+              <PhoneCall size={16} /> CRM Follow-ups
             </h3>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Healthy Products</span>
-              <span style={{ fontWeight: 600 }}>{data.metrics.totalProducts - data.metrics.lowStockCount}</span>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: 'var(--danger)', fontWeight: 500 }}>Overdue</span>
+                <span style={{ fontWeight: 600, color: 'var(--danger)' }}>{metrics.followUps?.overdue || 0}</span>
+              </div>
+              <div style={{ padding: '12px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: 'var(--warning)', fontWeight: 500 }}>Due Today</span>
+                <span style={{ fontWeight: 600, color: 'var(--warning)' }}>{metrics.followUps?.today || 0}</span>
+              </div>
+              <div style={{ padding: '12px', background: 'rgba(91, 92, 226, 0.05)', border: '1px solid rgba(91, 92, 226, 0.2)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: 500 }}>Upcoming</span>
+                <span style={{ fontWeight: 600, color: 'var(--primary)' }}>{metrics.followUps?.upcoming || 0}</span>
+              </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '13px', color: 'var(--warning)' }}>Low Stock Products</span>
-              <span style={{ fontWeight: 600, color: 'var(--warning)' }}>{data.metrics.lowStockCount}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-
-  const renderSalesAnalytics = () => (
-    <>
-      <div className="card" style={{ marginBottom: '24px' }}>
-        <h3 style={{ fontSize: '15px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ChartNoAxesCombined size={16} /> Sales Performance
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Sales Value</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>₹{metrics.confirmedSalesValue.toFixed(2)}</div>
-          </div>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Average Order Value</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>₹{metrics.averageChallanValue.toFixed(2)}</div>
-          </div>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Pending Follow-ups</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>{metrics.followUpCount}</div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-
-  const renderWarehouseAnalytics = () => (
-    <>
-      <div className="card" style={{ marginBottom: '24px' }}>
-        <h3 style={{ fontSize: '15px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ChartNoAxesCombined size={16} /> Inventory Analytics
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Total Products Monitored</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>{data.metrics.totalProducts}</div>
-          </div>
-          <div style={{ padding: '16px', border: '1px solid var(--warning-bg)', borderRadius: 'var(--radius-md)', backgroundColor: '#fefcf8' }}>
-            <div style={{ fontSize: '12px', color: 'var(--warning)', marginBottom: '4px' }}>Low Stock Items</div>
-            <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--warning)' }}>{data.metrics.lowStockCount}</div>
-          </div>
-          <div style={{ padding: '16px', border: '1px solid var(--danger-bg)', borderRadius: 'var(--radius-md)', backgroundColor: '#fffcfc' }}>
-            <div style={{ fontSize: '12px', color: 'var(--danger)', marginBottom: '4px' }}>Out of Stock</div>
-            <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--danger)' }}>
-              {metrics.outOfStockCount}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="card" style={{ marginBottom: '24px' }}>
-        <h3 style={{ fontSize: '14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Package size={16} /> Recent Stock Movements
-        </h3>
-        {data.recentMovements && data.recentMovements.length > 0 ? (
-          <div className="table-wrapper" style={{ margin: 0, boxShadow: 'none' }}>
-            <table style={{ margin: 0 }}>
-              <thead>
-                <tr style={{ background: 'var(--bg-app)' }}>
-                  <th>DATE</th>
-                  <th>PRODUCT</th>
-                  <th>TYPE</th>
-                  <th style={{ textAlign: 'right' }}>QTY</th>
-                  <th>REASON</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.recentMovements.map((m: any) => (
-                  <tr key={m.id}>
-                    <td>{new Date(m.createdAt).toLocaleDateString()}</td>
-                    <td style={{ fontWeight: 500 }}>{m.product.name}</td>
-                    <td>
-                      <span className={m.type === 'IN' ? 'badge badge-success' : 'badge badge-error'}>
-                        {m.type}
-                      </span>
-                    </td>
-                    <td style={{ textAlign: 'right', fontWeight: 500 }}>
-                      {m.type === 'IN' ? '+' : '-'}{m.qty}
-                    </td>
-                    <td>{m.reason}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="empty-state" style={{ padding: '24px' }}>
-            No recent stock movements.
-          </div>
-        )}
-      </div>
-    </>
-  );
-
-  const renderAccountsAnalytics = () => (
-    <>
-      <div className="card" style={{ marginBottom: '24px' }}>
-        <h3 style={{ fontSize: '15px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ChartNoAxesCombined size={16} /> Financial Overview
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Confirmed Sales Value</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>₹{metrics.confirmedSalesValue.toFixed(2)}</div>
-          </div>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Confirmed Sales Count</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>
-              {metrics.confirmedCount}
-            </div>
-          </div>
-          <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Average Order Value</div>
-            <div style={{ fontSize: '20px', fontWeight: 600 }}>₹{metrics.averageChallanValue.toFixed(2)}</div>
+            
+            {(metrics.followUps?.total || 0) === 0 && (
+              <div style={{ marginTop: '16px', fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
+                No follow-ups scheduled.
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -222,14 +241,15 @@ const AnalyticsContainer: React.FC = () => {
       <div className="page-header">
         <div>
           <h1 className="page-title">Analytics</h1>
-          <div className="page-subtitle">Key performance metrics and trends</div>
+          <div className="page-subtitle">Key performance metrics and business trends</div>
         </div>
       </div>
 
-      {user.role === 'ADMIN' && renderAdminAnalytics()}
-      {user.role === 'SALES' && renderSalesAnalytics()}
-      {user.role === 'WAREHOUSE' && renderWarehouseAnalytics()}
-      {user.role === 'ACCOUNTS' && renderAccountsAnalytics()}
+      {user.role === 'ADMIN' ? renderAdminAnalytics() : (
+        <div className="alert alert-info" style={{ marginTop: '20px' }}>
+          Analytics dashboards for other roles follow the same data structure and use role-specific KPIs.
+        </div>
+      )}
     </div>
   );
 };

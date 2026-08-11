@@ -21,7 +21,10 @@ router.get('/stats', async (req: Request, res: Response): Promise<void> => {
       allProducts,
       statusGroup,
       confirmedSalesAggr,
-      followUpCount,
+
+      allCustomersWithFollowUp,
+      customerTypeGroup,
+      customerStatusGroup,
       recentMovements
     ] = await Promise.all([
       prisma.customer.count(),
@@ -44,8 +47,17 @@ router.get('/stats', async (req: Request, res: Response): Promise<void> => {
         _sum: { totalAmount: true },
         _count: { _all: true }
       }),
-      prisma.customer.count({
-        where: { followUpDate: { not: null } }
+      prisma.customer.findMany({
+        where: { followUpDate: { not: null } },
+        select: { followUpDate: true }
+      }),
+      prisma.customer.groupBy({
+        by: ['customerType'],
+        _count: { _all: true }
+      }),
+      prisma.customer.groupBy({
+        by: ['status'],
+        _count: { _all: true }
       }),
       prisma.stockMovement.findMany({
         take: 10,
@@ -67,6 +79,34 @@ router.get('/stats', async (req: Request, res: Response): Promise<void> => {
     const confirmedCount = confirmedSalesAggr._count._all || 0;
     const averageChallanValue = confirmedCount > 0 ? confirmedSalesValue / confirmedCount : 0;
 
+    const customerTypeDistribution = {
+      RETAIL: customerTypeGroup.find(c => c.customerType === 'RETAIL')?._count._all || 0,
+      WHOLESALE: customerTypeGroup.find(c => c.customerType === 'WHOLESALE')?._count._all || 0,
+      DISTRIBUTOR: customerTypeGroup.find(c => c.customerType === 'DISTRIBUTOR')?._count._all || 0,
+    };
+
+    const customerStatusDistribution = {
+      LEAD: customerStatusGroup.find(c => c.status === 'LEAD')?._count._all || 0,
+      ACTIVE: customerStatusGroup.find(c => c.status === 'ACTIVE')?._count._all || 0,
+      INACTIVE: customerStatusGroup.find(c => c.status === 'INACTIVE')?._count._all || 0,
+    };
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    let followUpOverdue = 0;
+    let followUpToday = 0;
+    let followUpUpcoming = 0;
+
+    allCustomersWithFollowUp.forEach(c => {
+      const date = new Date(c.followUpDate!);
+      if (date < today) followUpOverdue++;
+      else if (date >= today && date < tomorrow) followUpToday++;
+      else followUpUpcoming++;
+    });
+
     res.json({
       metrics: {
         totalCustomers,
@@ -74,11 +114,19 @@ router.get('/stats', async (req: Request, res: Response): Promise<void> => {
         totalChallans,
         lowStockCount: lowStockProducts.length,
         outOfStockCount: allProducts.filter(p => p.stock === 0).length,
+        inStockCount: allProducts.filter(p => p.stock > p.minStock).length,
         confirmedSalesValue,
         confirmedCount,
         averageChallanValue,
         statusDistribution,
-        followUpCount
+        customerTypeDistribution,
+        customerStatusDistribution,
+        followUps: {
+          overdue: followUpOverdue,
+          today: followUpToday,
+          upcoming: followUpUpcoming,
+          total: allCustomersWithFollowUp.length
+        }
       },
       lowStockProducts: lowStockProducts.slice(0, 10), // return top 10 low stock items for dashboard
       recentChallans,

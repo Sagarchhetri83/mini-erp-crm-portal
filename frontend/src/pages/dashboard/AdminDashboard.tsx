@@ -145,6 +145,31 @@ const AdminDashboard: React.FC = () => {
               )}
             </div>
           </div>
+
+          <div className="card" style={{ padding: 0, overflow: 'hidden', marginTop: '24px' }}>
+            <div className="card-header" style={{ padding: '12px 16px', margin: 0, borderBottom: '1px solid var(--border-color)', fontSize: '13px' }}>
+              Recent Activity
+            </div>
+            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {data.recentMovements.slice(0, 4).map(m => (
+                <div key={m.id} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: m.type === 'IN' ? 'var(--success)' : 'var(--danger)', marginTop: '4px', flexShrink: 0 }}></div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 500 }}>{m.product.name}</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                      Stock {m.type === 'IN' ? 'increased' : 'decreased'} by {m.qty}
+                    </span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                      {new Date(m.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {data.recentMovements.length === 0 && (
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No recent activity.</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

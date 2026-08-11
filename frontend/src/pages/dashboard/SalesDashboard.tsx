@@ -43,7 +43,7 @@ const SalesDashboard: React.FC = () => {
             <span className="kpi-label">Active Leads</span>
             <CheckCircle size={16} style={{ color: 'var(--success)' }} />
           </div>
-          <div className="kpi-value">—</div> {/* Real metric would go here if backend supported it natively */}
+          <div className="kpi-value">{data.metrics.followUps?.total || 0}</div>
         </div>
 
         <div className="card kpi-card">

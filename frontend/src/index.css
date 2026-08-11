@@ -78,8 +78,8 @@ button {
 
 /* Sidebar */
 .sidebar {
-  width: 250px;
-  background-color: #14151B; /* Very dark */
+  width: 220px;
+  background-color: #17191F;
   color: #FFFFFF;
   display: flex;
   flex-direction: column;

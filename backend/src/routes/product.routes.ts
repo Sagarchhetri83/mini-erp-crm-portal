@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient, StockMovementType } from '@prisma/client';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { notifyRoles } from '../utils/notification';
 
 const router: Router = Router();
 const prisma = new PrismaClient();
@@ -254,6 +255,16 @@ router.post('/:id/adjust-stock', requireRole('ADMIN', 'WAREHOUSE'), async (req: 
 
       return p;
     });
+
+    // Send notifications based on adjustment type and stock level
+    const message = `Stock ${type === 'IN' ? 'increased' : 'decreased'} by ${parsedQty} for ${updatedProduct.name}.`;
+    notifyRoles(['ADMIN', 'WAREHOUSE'], 'Stock Adjustment', message);
+
+    if (updatedProduct.stock === 0) {
+      notifyRoles(['ADMIN', 'WAREHOUSE'], 'Out of Stock', `${updatedProduct.name} is now out of stock!`);
+    } else if (updatedProduct.stock <= updatedProduct.minStock) {
+      notifyRoles(['ADMIN', 'WAREHOUSE'], 'Low Stock Alert', `${updatedProduct.name} has fallen to or below its minimum stock level.`);
+    }
 
     res.json(updatedProduct);
   } catch (err) {

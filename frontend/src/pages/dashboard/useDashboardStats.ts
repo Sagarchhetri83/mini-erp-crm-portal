@@ -16,7 +16,23 @@ export interface DashboardStats {
       CONFIRMED: number;
       CANCELLED: number;
     };
-    followUpCount: number;
+    customerTypeDistribution?: {
+      RETAIL: number;
+      WHOLESALE: number;
+      DISTRIBUTOR: number;
+    };
+    customerStatusDistribution?: {
+      LEAD: number;
+      ACTIVE: number;
+      INACTIVE: number;
+    };
+    followUps?: {
+      overdue: number;
+      today: number;
+      upcoming: number;
+      total: number;
+    };
+    inStockCount?: number;
   };
   lowStockProducts: any[];
   recentChallans: any[];

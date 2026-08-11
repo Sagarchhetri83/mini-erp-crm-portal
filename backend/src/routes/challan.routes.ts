@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient, ChallanStatus, StockMovementType } from '@prisma/client';
 import { requireAuth, requireRole } from '../middleware/auth';
+import { notifyRoles, notifyUser } from '../utils/notification';
 
 const router: Router = Router();
 const prisma = new PrismaClient();
@@ -235,6 +236,12 @@ router.post('/:id/confirm', requireRole('ADMIN', 'SALES', 'WAREHOUSE'), async (r
       });
     });
 
+    // Send notifications
+    notifyRoles(['ADMIN', 'ACCOUNTS'], 'Challan Confirmed', `Challan ${challan.challanNo} was confirmed.`);
+    if (challan.createdById !== req.user!.id) {
+      notifyUser(challan.createdById, 'Challan Confirmed', `Your challan ${challan.challanNo} was confirmed.`);
+    }
+
     res.json(updatedChallan);
   } catch (err) {
     console.error('Confirm challan error:', err);
@@ -263,6 +270,12 @@ router.delete('/:id', requireRole('ADMIN', 'SALES'), async (req: Request, res: R
       where: { id: challan.id },
       data: { status: 'CANCELLED' },
     });
+
+    // Send notifications
+    notifyRoles(['ADMIN'], 'Challan Cancelled', `Challan ${challan.challanNo} was cancelled.`);
+    if (challan.createdById !== req.user!.id) {
+      notifyUser(challan.createdById, 'Challan Cancelled', `Your challan ${challan.challanNo} was cancelled.`);
+    }
 
     res.json(cancelled);
   } catch (err) {

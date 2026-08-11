@@ -37,7 +37,7 @@ const AccountsDashboard: React.FC = () => {
             <span className="kpi-label">Confirmed Challans</span>
             <CheckCircle size={16} style={{ color: 'var(--success)' }} />
           </div>
-          <div className="kpi-value">—</div> {/* Real metric would go here */}
+          <div className="kpi-value">{data.metrics.statusDistribution.CONFIRMED}</div>
         </div>
 
         <div className="card kpi-card">
@@ -45,7 +45,7 @@ const AccountsDashboard: React.FC = () => {
             <span className="kpi-label">Pending / Draft</span>
             <Clock size={16} style={{ color: 'var(--warning)' }} />
           </div>
-          <div className="kpi-value">—</div> {/* Real metric would go here */}
+          <div className="kpi-value">{data.metrics.statusDistribution.DRAFT}</div>
         </div>
 
         <div className="card kpi-card">

@@ -641,3 +641,45 @@ All test users have the same password: `Password123`
 5. **No multi-currency support**: All amounts are fixed to Indian Rupees.
 6. **No advanced user management UI**: Admin can see a placeholder for User Management. Creating/editing users requires direct database access or the Prisma seed script.
 7. **Docker support**: Not included in the base submission. Can be added as a bonus item.
+
+---
+
+## Production Deployment
+
+### Architecture
+
+GitHub
+  ↓
+Railway PostgreSQL
+  ↓
+Railway Backend API
+  ↓
+Vercel Frontend
+
+### Environment Variables
+
+**Backend:**
+- `DATABASE_URL`: PostgreSQL connection string (Railway PostgreSQL)
+- `JWT_SECRET`: Strong random secret for signing tokens
+- `PORT`: Port the server listens on
+- `FRONTEND_URL`: Allowed CORS origin (Vercel URL)
+
+**Frontend:**
+- `VITE_API_URL`: URL of the deployed backend API (Railway URL)
+
+### Deployment Commands
+
+**Backend:**
+```bash
+npm install
+npx prisma generate
+npm run build
+npm start
+```
+*(Database migrations should be run via `npx prisma migrate deploy` against the production database. Do NOT use `prisma migrate reset` in production.)*
+
+**Frontend:**
+```bash
+npm install
+npm run build
+```
