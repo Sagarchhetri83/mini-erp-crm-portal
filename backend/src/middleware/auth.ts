@@ -29,6 +29,8 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       return;
     }
 
+    const token = authHeader.split(' ')[1];
+
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       console.error('CRITICAL: JWT_SECRET environment variable is missing.');
