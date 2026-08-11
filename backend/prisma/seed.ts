@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role, CustomerType, CustomerStatus, ChallanStatus, StockMovementType } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -9,17 +9,21 @@ async function main() {
   // 1. Users
   const passwordHash = await bcrypt.hash('Password123', 10);
   const users = [
-    { name: 'Admin User',     email: 'admin@erp.com',     role: 'ADMIN'     as const },
-    { name: 'Sales User',     email: 'sales@erp.com',     role: 'SALES'     as const },
-    { name: 'Warehouse User', email: 'warehouse@erp.com', role: 'WAREHOUSE' as const },
-    { name: 'Accounts User',  email: 'accounts@erp.com',  role: 'ACCOUNTS'  as const },
+    { name: 'Admin User',     email: 'admin@erp.com',     role: Role.ADMIN },
+    { name: 'Sales User',     email: 'sales@erp.com',     role: Role.SALES },
+    { name: 'Warehouse User', email: 'warehouse@erp.com', role: Role.WAREHOUSE },
+    { name: 'Accounts User',  email: 'accounts@erp.com',  role: Role.ACCOUNTS },
   ];
 
   let adminUserId = '';
   for (const user of users) {
     const upserted = await prisma.user.upsert({
       where: { email: user.email },
-      update: {},
+      update: {
+        name: user.name,
+        password: passwordHash,
+        role: user.role,
+      },
       create: {
         name: user.name,
         email: user.email,
@@ -27,7 +31,7 @@ async function main() {
         role: user.role,
       },
     });
-    if (user.role === 'ADMIN') adminUserId = upserted.id;
+    if (user.role === Role.ADMIN) adminUserId = upserted.id;
     console.log(`  ✅ User: ${user.role}`);
   }
 
@@ -62,11 +66,11 @@ async function main() {
 
   // 2. Customers
   const customers = [
-    { id: 'seed-cust-1', name: 'Rajesh Sharma', businessName: 'Sharma Electronics', email: 'rajesh@sharmaelectronics.in', mobile: '9876543210', customerType: 'RETAIL' as const, status: 'ACTIVE' as const, address: 'Ahmedabad, Gujarat', gstNumber: '24ABCDE1234F1Z5' },
-    { id: 'seed-cust-2', name: 'Priya Mehta', businessName: 'Mehta Computer Solutions', email: 'priya@mehtacomputers.in', mobile: '9876543211', customerType: 'WHOLESALE' as const, status: 'ACTIVE' as const, address: 'Vadodara, Gujarat', gstNumber: '24XYZDE1234F1Z5' },
-    { id: 'seed-cust-3', name: 'Amit Patel', businessName: 'Patel IT Distributors', email: 'amit@patelit.in', mobile: '9876543212', customerType: 'DISTRIBUTOR' as const, status: 'ACTIVE' as const, address: 'Surat, Gujarat', gstNumber: '24PQRST1234F1Z5' },
-    { id: 'seed-cust-4', name: 'Neha Shah', businessName: 'Shah Office Systems', email: 'neha@shahofficesys.in', mobile: '9876543213', customerType: 'WHOLESALE' as const, status: 'LEAD' as const, address: 'Mumbai, Maharashtra', gstNumber: '27LMNOP1234F1Z5' },
-    { id: 'seed-cust-5', name: 'Vikram Singh', businessName: 'Singh Digital Store', email: 'vikram@singhdigital.in', mobile: '9876543214', customerType: 'RETAIL' as const, status: 'INACTIVE' as const, address: 'Pune, Maharashtra', gstNumber: '27UVWXY1234F1Z5' },
+    { id: 'seed-cust-1', name: 'Rajesh Sharma', businessName: 'Sharma Electronics', email: 'rajesh@sharmaelectronics.in', mobile: '9876543210', customerType: CustomerType.RETAIL, status: CustomerStatus.ACTIVE, address: 'Ahmedabad, Gujarat', gstNumber: '24ABCDE1234F1Z5' },
+    { id: 'seed-cust-2', name: 'Priya Mehta', businessName: 'Mehta Computer Solutions', email: 'priya@mehtacomputers.in', mobile: '9876543211', customerType: CustomerType.WHOLESALE, status: CustomerStatus.ACTIVE, address: 'Vadodara, Gujarat', gstNumber: '24XYZDE1234F1Z5' },
+    { id: 'seed-cust-3', name: 'Amit Patel', businessName: 'Patel IT Distributors', email: 'amit@patelit.in', mobile: '9876543212', customerType: CustomerType.DISTRIBUTOR, status: CustomerStatus.ACTIVE, address: 'Surat, Gujarat', gstNumber: '24PQRST1234F1Z5' },
+    { id: 'seed-cust-4', name: 'Neha Shah', businessName: 'Shah Office Systems', email: 'neha@shahofficesys.in', mobile: '9876543213', customerType: CustomerType.WHOLESALE, status: CustomerStatus.LEAD, address: 'Mumbai, Maharashtra', gstNumber: '27LMNOP1234F1Z5' },
+    { id: 'seed-cust-5', name: 'Vikram Singh', businessName: 'Singh Digital Store', email: 'vikram@singhdigital.in', mobile: '9876543214', customerType: CustomerType.RETAIL, status: CustomerStatus.INACTIVE, address: 'Pune, Maharashtra', gstNumber: '27UVWXY1234F1Z5' },
   ];
 
   for (const c of customers) {
@@ -133,7 +137,7 @@ async function main() {
     create: {
       challanNo: 'CHL-2026-0001',
       customerId: 'seed-cust-2', // Priya Mehta (WHOLESALE)
-      status: 'CONFIRMED',
+      status: ChallanStatus.CONFIRMED,
       totalAmount: ch1Total,
       createdById: adminUserId,
       items: {
@@ -158,7 +162,7 @@ async function main() {
     create: {
       challanNo: 'CHL-2026-0002',
       customerId: 'seed-cust-3', // Amit Patel (DISTRIBUTOR)
-      status: 'CONFIRMED',
+      status: ChallanStatus.CONFIRMED,
       totalAmount: ch2Total,
       createdById: adminUserId,
       items: {
@@ -182,7 +186,7 @@ async function main() {
     create: {
       challanNo: 'CHL-2026-0003',
       customerId: 'seed-cust-1', // Rajesh Sharma (RETAIL)
-      status: 'DRAFT',
+      status: ChallanStatus.DRAFT,
       totalAmount: ch3Total,
       createdById: adminUserId,
       items: {
@@ -199,30 +203,30 @@ async function main() {
   await prisma.stockMovement.upsert({
     where: { id: 'seed-mov-1' },
     update: {},
-    create: { id: 'seed-mov-1', productId: p1.id, type: 'IN', qty: 50, reason: 'Initial Supplier Purchase', createdById: adminUserId }
+    create: { id: 'seed-mov-1', productId: p1.id, type: StockMovementType.IN, qty: 50, reason: 'Initial Supplier Purchase', createdById: adminUserId }
   });
   await prisma.stockMovement.upsert({
     where: { id: 'seed-mov-2' },
     update: {},
-    create: { id: 'seed-mov-2', productId: p1.id, type: 'OUT', qty: 5, reason: 'Sales Challan CHL-2026-0001', createdById: adminUserId }
+    create: { id: 'seed-mov-2', productId: p1.id, type: StockMovementType.OUT, qty: 5, reason: 'Sales Challan CHL-2026-0001', createdById: adminUserId }
   });
   await prisma.stockMovement.upsert({
     where: { id: 'seed-mov-3' },
     update: {},
-    create: { id: 'seed-mov-3', productId: p4.id, type: 'IN', qty: 220, reason: 'Bulk Purchase from Hikvision', createdById: adminUserId }
+    create: { id: 'seed-mov-3', productId: p4.id, type: StockMovementType.IN, qty: 220, reason: 'Bulk Purchase from Hikvision', createdById: adminUserId }
   });
   await prisma.stockMovement.upsert({
     where: { id: 'seed-mov-4' },
     update: {},
-    create: { id: 'seed-mov-4', productId: p4.id, type: 'OUT', qty: 20, reason: 'Sales Challan CHL-2026-0002', createdById: adminUserId }
+    create: { id: 'seed-mov-4', productId: p4.id, type: StockMovementType.OUT, qty: 20, reason: 'Sales Challan CHL-2026-0002', createdById: adminUserId }
   });
   const tplRouter = dbProducts.find(p => p.sku === 'TPL-ARCH-C6')!;
   await prisma.stockMovement.upsert({
     where: { id: 'seed-mov-5' },
     update: {
-      productId: tplRouter.id, type: 'OUT', qty: 3, reason: 'Sales Challan CHL-2026-0004 (Archived)'
+      productId: tplRouter.id, type: StockMovementType.OUT, qty: 3, reason: 'Sales Challan CHL-2026-0004 (Archived)'
     },
-    create: { id: 'seed-mov-5', productId: tplRouter.id, type: 'OUT', qty: 3, reason: 'Sales Challan CHL-2026-0004 (Archived)', createdById: adminUserId }
+    create: { id: 'seed-mov-5', productId: tplRouter.id, type: StockMovementType.OUT, qty: 3, reason: 'Sales Challan CHL-2026-0004 (Archived)', createdById: adminUserId }
   });
   console.log(`  ✅ Seeded Stock Movements`);
 
