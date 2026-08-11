@@ -65,7 +65,7 @@ export const GlobalSearch: React.FC = () => {
       <div 
         className={`search-input-container ${isOpen ? 'active' : ''}`} 
         style={{ 
-          display: 'flex', alignItems: 'center', background: 'var(--bg-color)', 
+          display: 'flex', alignItems: 'center', background: 'var(--bg-app)', 
           borderRadius: '20px', padding: '6px 12px', border: '1px solid var(--border-color)',
           width: isOpen ? '300px' : '40px', transition: 'width 0.2s', overflow: 'hidden'
         }}
@@ -88,7 +88,7 @@ export const GlobalSearch: React.FC = () => {
 
       {isOpen && query.length >= 2 && (
         <div className="search-dropdown" style={{
-          position: 'absolute', top: '40px', right: 0, width: '350px', background: 'var(--surface-color)',
+          position: 'absolute', top: '40px', right: 0, width: '350px', background: 'var(--bg-surface)',
           border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           zIndex: 100, maxHeight: '400px', overflowY: 'auto'
         }}>
@@ -100,7 +100,7 @@ export const GlobalSearch: React.FC = () => {
 
           {results.customers.length > 0 && (
             <div className="search-group">
-              <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', background: 'var(--bg-color)' }}>Customers</div>
+              <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', background: 'var(--bg-app)' }}>Customers</div>
               {results.customers.map(c => (
                 <div key={c.id} className="search-item" style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid var(--border-color)' }} onClick={() => handleNavigate(`${rolePrefix}/customers/${c.id}`)}>
                   <div style={{ fontWeight: 500, fontSize: '13px' }}>{c.name}</div>
@@ -112,7 +112,7 @@ export const GlobalSearch: React.FC = () => {
 
           {results.products.length > 0 && (
             <div className="search-group">
-              <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', background: 'var(--bg-color)' }}>Products</div>
+              <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', background: 'var(--bg-app)' }}>Products</div>
               {results.products.map(p => (
                 <div key={p.id} className="search-item" style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid var(--border-color)' }} onClick={() => handleNavigate(`${rolePrefix}/products/${p.id}`)}>
                   <div style={{ fontWeight: 500, fontSize: '13px' }}>{p.name}</div>
@@ -124,7 +124,7 @@ export const GlobalSearch: React.FC = () => {
 
           {results.challans.length > 0 && (
             <div className="search-group">
-              <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', background: 'var(--bg-color)' }}>Challans</div>
+              <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', background: 'var(--bg-app)' }}>Challans</div>
               {results.challans.map(ch => (
                 <div key={ch.id} className="search-item" style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid var(--border-color)' }} onClick={() => handleNavigate(`${rolePrefix}/challans/${ch.id}`)}>
                   <div style={{ fontWeight: 500, fontSize: '13px', color: 'var(--primary)' }}>{ch.challanNo}</div>

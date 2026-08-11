@@ -44,18 +44,18 @@ export const ProfileDropdown: React.FC = () => {
           {user.name.charAt(0).toUpperCase()}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-color)' }}>{user.name}</span>
+            <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>{user.name}</span>
         </div>
       </button>
 
       {isOpen && (
         <div className="profile-dropdown" style={{
-          position: 'absolute', top: '44px', right: 0, width: '240px', background: 'var(--surface-color)',
+          position: 'absolute', top: '44px', right: 0, width: '240px', background: 'var(--bg-surface)',
           border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           zIndex: 100, overflow: 'hidden'
         }}>
-          <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-color)' }}>
-            <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-color)' }}>{user.name}</div>
+          <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-app)' }}>
+            <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>{user.name}</div>
             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>{user.email}</div>
             <div style={{ fontSize: '10px', background: 'var(--primary)', color: 'white', display: 'inline-block', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
               {user.role}
@@ -65,14 +65,14 @@ export const ProfileDropdown: React.FC = () => {
           <div style={{ padding: '8px 0' }}>
             <button className="dropdown-item" onClick={() => handleNavigate('/profile')} style={{
               width: '100%', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '10px',
-              background: 'none', border: 'none', color: 'var(--text-color)', fontSize: '13px', cursor: 'pointer',
+              background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer',
               textAlign: 'left'
             }}>
               <User size={16} /> My Profile
             </button>
             <button className="dropdown-item" onClick={() => handleNavigate('/settings')} style={{
               width: '100%', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '10px',
-              background: 'none', border: 'none', color: 'var(--text-color)', fontSize: '13px', cursor: 'pointer',
+              background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer',
               textAlign: 'left'
             }}>
               <Settings size={16} /> Account Settings

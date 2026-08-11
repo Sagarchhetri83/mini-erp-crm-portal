@@ -74,7 +74,7 @@ export const NotificationBell: React.FC = () => {
 
       {isOpen && (
         <div className="notification-dropdown" style={{
-          position: 'absolute', top: '36px', right: '-10px', width: '320px', background: 'var(--surface-color)',
+          position: 'absolute', top: '36px', right: '-10px', width: '320px', background: 'var(--bg-surface)',
           border: '1px solid var(--border-color)', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           zIndex: 100, display: 'flex', flexDirection: 'column', maxHeight: '450px'
         }}>
@@ -100,7 +100,7 @@ export const NotificationBell: React.FC = () => {
                   display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
                 }}>
                   <div style={{ flex: 1, paddingRight: '12px' }}>
-                    <div style={{ fontWeight: n.isRead ? 500 : 600, fontSize: '13px', marginBottom: '4px', color: 'var(--text-color)' }}>{n.title}</div>
+                    <div style={{ fontWeight: n.isRead ? 500 : 600, fontSize: '13px', marginBottom: '4px', color: 'var(--text-primary)' }}>{n.title}</div>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.4' }}>{n.message}</div>
                     <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '6px' }}>
                       {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

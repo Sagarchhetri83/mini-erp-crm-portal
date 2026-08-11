@@ -34,7 +34,12 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const secret = process.env.JWT_SECRET || 'fallback-secret';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('CRITICAL: JWT_SECRET environment variable is missing.');
+      res.status(500).json({ error: 'Internal server error: Authentication not configured properly.' });
+      return;
+    }
     const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '24h' });
 
     res.json({

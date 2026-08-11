@@ -29,8 +29,12 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       return;
     }
 
-    const token = authHeader.split(' ')[1];
-    const secret = process.env.JWT_SECRET || 'fallback-secret';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('CRITICAL: JWT_SECRET environment variable is missing.');
+      res.status(500).json({ error: 'Server configuration error.' });
+      return;
+    }
 
     const decoded = jwt.verify(token, secret) as { userId: string };
 
