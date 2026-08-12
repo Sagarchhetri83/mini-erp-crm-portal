@@ -12,6 +12,30 @@ A full-stack ERP and CRM platform for managing customers, products, inventory, s
 [Postman Collection](./mini_erp_postman_collection.json) ·
 [GitHub Actions](https://github.com/Sagarchhetri83/mini-erp-crm-portal/actions)
 
+
+## Demo Access
+
+The live application is available for evaluation using the following demo accounts.
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@erp.com` | `Password123` |
+| Sales | `sales@erp.com` | `Password123` |
+| Warehouse | `warehouse@erp.com` | `Password123` |
+| Accounts | `accounts@erp.com` | `Password123` |
+
+These are demonstration accounts created by the database seed process. They do not contain production credentials or sensitive user data.
+
+### Recommended Starting Point
+
+For the complete application workflow, use the **Admin** account first.
+
+1. Open the [Live Application](https://mini-erp-crm-portal-vert.vercel.app/)
+2. Sign in with `admin@erp.com`
+3. Password: `Password123`
+4. Explore Dashboard, Analytics, Customers, Products, Inventory and Sales Challans.
+5. Other accounts can be used to verify role-based access control.
+
 ---
 
 ## Project Overview
