@@ -188,13 +188,15 @@ const Layout: React.FC = () => {
       {/* Main Content Area */}
       <main className="main-content">
         <header className="top-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+          <div className="breadcrumb-container">
             <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)} aria-label="Open Navigation Menu">
               <Menu size={18} />
             </button>
-            <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Dashboard</span>
-            <span style={{ color: 'var(--text-muted)' }}>/</span>
-            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{getPageTitle()}</span>
+            <div className="breadcrumb-text">
+              <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Dashboard</span>
+              <span style={{ color: 'var(--text-muted)', margin: '0 8px' }}>/</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{getPageTitle()}</span>
+            </div>
           </div>
           
           <div className="header-right">

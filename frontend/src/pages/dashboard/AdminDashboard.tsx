@@ -88,7 +88,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* ROW 2: TWO LARGE ANALYTICS CARDS (Sales Overview + Inventory Distribution) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' }}>
+      <div className="grid-responsive-2" style={{ gap: '20px' }}>
         
         {/* Sales Overview Area Chart */}
         <div className="card">
@@ -208,7 +208,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* ROW 3: TWO ANALYTICS CARDS (Product Stock Bar Summary + Sales Challan Trends) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' }}>
+      <div className="grid-responsive-2" style={{ gap: '20px' }}>
         
         {/* Product Stock Summary Bar Chart */}
         <div className="card">
@@ -290,7 +290,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* ROW 4: TWO OPERATIONAL CARDS (Recent Sales Challans + Recent Activity) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '20px' }}>
+      <div className="grid-responsive-2" style={{ gap: '20px' }}>
         
         {/* Recent Sales Challans Table */}
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>

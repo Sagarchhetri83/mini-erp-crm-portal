@@ -43,7 +43,7 @@ export const ProfileDropdown: React.FC = () => {
         <div className="avatar-initial" style={{ width: '32px', height: '32px', background: 'var(--primary)', color: 'white', border: 'none', fontSize: '13px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
           {user.name.charAt(0).toUpperCase()}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div className="hide-on-mobile" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>{user.name}</span>
         </div>
       </button>

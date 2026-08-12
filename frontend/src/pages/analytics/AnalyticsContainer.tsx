@@ -254,7 +254,7 @@ const AnalyticsContainer: React.FC = () => {
               {metrics.statusDistribution.CANCELLED > 0 && <div style={{ width: `${cancelledPct}%`, background: 'var(--danger)' }} title={`Cancelled: ${cancelledPct.toFixed(1)}%`} />}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            <div className="grid-responsive-3" style={{ gap: '12px' }}>
               <div style={{ padding: '12px', background: '#FAFAF8', borderRadius: '8px', border: '1px solid #ECEAE5', textAlign: 'center' }}>
                 <CheckCircle size={16} style={{ color: 'var(--success)', margin: '0 auto 6px' }} />
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Confirmed Orders</div>
@@ -278,7 +278,7 @@ const AnalyticsContainer: React.FC = () => {
             <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Users size={16} /> Customer Classification Analytics
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div className="grid-responsive-2" style={{ gap: '20px' }}>
               <div>
                 <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '10px', textTransform: 'uppercase' }}>Customer Types</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
@@ -378,7 +378,7 @@ const AnalyticsContainer: React.FC = () => {
               {metrics.outOfStockCount > 0 && <div style={{ width: `${outOfStockPct}%`, background: 'var(--danger)' }} title={`Out of Stock: ${outOfStockPct.toFixed(1)}%`} />}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            <div className="grid-responsive-3" style={{ gap: '12px' }}>
               <div style={{ padding: '12px', background: '#FAFAF8', borderRadius: '8px', border: '1px solid #ECEAE5', textAlign: 'center' }}>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Healthy</div>
                 <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--success)' }}>{inStockPct.toFixed(0)}%</div>
