@@ -58,14 +58,18 @@ router.post('/', requireRole('ADMIN', 'SALES'), async (req: Request, res: Respon
         return;
       }
       
-      const qty = parseInt(item.quantity);
+      const qty = parseInt(item.qty);
       if (isNaN(qty) || qty <= 0) {
         res.status(400).json({ error: `Invalid quantity for product ${product.name}.` });
         return;
       }
 
-      // We do not check stock here since it's just a DRAFT.
-      // Stock is checked and deducted upon CONFIRMATION.
+      if (qty > product.stock) {
+        res.status(400).json({ error: `Insufficient stock for ${product.name}. Required: ${qty}, Available: ${product.stock}.` });
+        return;
+      }
+
+      // Stock is deducted upon CONFIRMATION, but we validate availability during DRAFT creation.
 
       const lineTotal = product.price * qty;
       totalAmount += lineTotal;
