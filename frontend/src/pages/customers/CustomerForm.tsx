@@ -108,7 +108,7 @@ const CustomerForm: React.FC = () => {
             Customer Information
           </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+          <div className="grid-responsive-2" style={{ marginBottom: '24px' }}>
             <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Name *</label>
               <input
@@ -177,7 +177,7 @@ const CustomerForm: React.FC = () => {
             CRM Information
           </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+          <div className="grid-responsive-2" style={{ marginBottom: '24px' }}>
             <div className="form-group" style={{ margin: 0 }}>
               <label className="form-label">Customer Type</label>
               <select

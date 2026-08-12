@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -10,7 +10,8 @@ import {
   Box,
   ChartNoAxesCombined,
   UserCircle,
-  MoreHorizontal
+  MoreHorizontal,
+  Menu
 } from 'lucide-react';
 import { GlobalSearch } from './GlobalSearch';
 import { NotificationBell } from './NotificationBell';
@@ -20,10 +21,13 @@ const Layout: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (!user) return null;
 
   const rolePrefix = `/${user.role.toLowerCase()}`;
+
+  const closeSidebar = () => setIsSidebarOpen(false);
 
   const getPageTitle = () => {
     const path = location.pathname;
@@ -40,33 +44,33 @@ const Layout: React.FC = () => {
   const renderAdminNav = () => (
     <>
       <div className="nav-section">Main</div>
-      <NavLink to={rolePrefix} end className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={rolePrefix} end className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <LayoutDashboard size={14} /> Dashboard
       </NavLink>
-      <NavLink to={`${rolePrefix}/analytics`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/analytics`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <ChartNoAxesCombined size={14} /> Analytics
       </NavLink>
       
       <div className="nav-section">CRM</div>
-      <NavLink to={`${rolePrefix}/customers`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/customers`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <Users size={14} /> Customers
       </NavLink>
       
       <div className="nav-section">Inventory</div>
-      <NavLink to={`${rolePrefix}/products`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/products`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <Package size={14} /> Products
       </NavLink>
       
       <div className="nav-section">Sales</div>
-      <NavLink to={`${rolePrefix}/challans`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/challans`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <FileText size={14} /> Sales Challans
       </NavLink>
 
       <div className="nav-section">System</div>
-      <NavLink to={`${rolePrefix}/users`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/users`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <Users size={14} /> Users
       </NavLink>
-      <NavLink to={`${rolePrefix}/settings`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/settings`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <Settings size={14} /> Settings
       </NavLink>
     </>
@@ -75,25 +79,25 @@ const Layout: React.FC = () => {
   const renderSalesNav = () => (
     <>
       <div className="nav-section">Main</div>
-      <NavLink to={rolePrefix} end className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={rolePrefix} end className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <LayoutDashboard size={14} /> Dashboard
       </NavLink>
-      <NavLink to={`${rolePrefix}/analytics`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/analytics`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <ChartNoAxesCombined size={14} /> Analytics
       </NavLink>
       
       <div className="nav-section">CRM</div>
-      <NavLink to={`${rolePrefix}/customers`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/customers`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <Users size={14} /> Customers
       </NavLink>
       
       <div className="nav-section">Sales</div>
-      <NavLink to={`${rolePrefix}/challans`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/challans`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <FileText size={14} /> Sales Challans
       </NavLink>
 
       <div className="nav-section">Account</div>
-      <a href="#" onClick={(e) => e.preventDefault()} className="sidebar-nav-item">
+      <a href="#" onClick={(e) => { e.preventDefault(); closeSidebar(); }} className="sidebar-nav-item">
         <UserCircle size={14} /> My Profile
       </a>
     </>
@@ -102,25 +106,25 @@ const Layout: React.FC = () => {
   const renderWarehouseNav = () => (
     <>
       <div className="nav-section">Main</div>
-      <NavLink to={rolePrefix} end className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={rolePrefix} end className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <LayoutDashboard size={14} /> Dashboard
       </NavLink>
-      <NavLink to={`${rolePrefix}/analytics`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/analytics`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <ChartNoAxesCombined size={14} /> Analytics
       </NavLink>
       
       <div className="nav-section">Inventory</div>
-      <NavLink to={`${rolePrefix}/products`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/products`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <Package size={14} /> Products & Stock
       </NavLink>
       
       <div className="nav-section">Sales</div>
-      <NavLink to={`${rolePrefix}/challans`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/challans`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <FileText size={14} /> Sales Challans
       </NavLink>
 
       <div className="nav-section">Account</div>
-      <a href="#" onClick={(e) => e.preventDefault()} className="sidebar-nav-item">
+      <a href="#" onClick={(e) => { e.preventDefault(); closeSidebar(); }} className="sidebar-nav-item">
         <UserCircle size={14} /> My Profile
       </a>
     </>
@@ -129,20 +133,20 @@ const Layout: React.FC = () => {
   const renderAccountsNav = () => (
     <>
       <div className="nav-section">Main</div>
-      <NavLink to={rolePrefix} end className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={rolePrefix} end className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <LayoutDashboard size={14} /> Dashboard
       </NavLink>
-      <NavLink to={`${rolePrefix}/analytics`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/analytics`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <ChartNoAxesCombined size={14} /> Analytics
       </NavLink>
       
       <div className="nav-section">Sales</div>
-      <NavLink to={`${rolePrefix}/challans`} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${rolePrefix}/challans`} className={({ isActive }) => (isActive ? 'active' : '')} onClick={closeSidebar}>
         <FileText size={14} /> Sales Challans
       </NavLink>
 
       <div className="nav-section">Account</div>
-      <a href="#" onClick={(e) => e.preventDefault()} className="sidebar-nav-item">
+      <a href="#" onClick={(e) => { e.preventDefault(); closeSidebar(); }} className="sidebar-nav-item">
         <UserCircle size={14} /> My Profile
       </a>
     </>
@@ -151,7 +155,8 @@ const Layout: React.FC = () => {
   return (
     <div className="app-layout">
       {/* Sidebar Navigation */}
-      <aside className="sidebar">
+      <div className={`sidebar-overlay ${isSidebarOpen ? 'sidebar-open' : ''}`} onClick={closeSidebar} aria-hidden="true" />
+      <aside className={`sidebar ${isSidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-header">
           <div style={{ background: 'var(--primary)', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Box size={16} style={{ color: '#FFFFFF' }} />
@@ -174,7 +179,7 @@ const Layout: React.FC = () => {
             <span className="name">{user.name}</span>
             <span className="role">{user.role.toLowerCase()}@erp.com</span>
           </div>
-          <button className="btn-signout-icon" onClick={() => navigate(`${rolePrefix}/settings`)} title="Settings">
+          <button className="btn-signout-icon" onClick={() => { navigate(`${rolePrefix}/settings`); closeSidebar(); }} title="Settings">
             <MoreHorizontal size={16} />
           </button>
         </div>
@@ -184,6 +189,9 @@ const Layout: React.FC = () => {
       <main className="main-content">
         <header className="top-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)} aria-label="Open Navigation Menu">
+              <Menu size={18} />
+            </button>
             <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Dashboard</span>
             <span style={{ color: 'var(--text-muted)' }}>/</span>
             <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{getPageTitle()}</span>
@@ -207,3 +215,4 @@ const Layout: React.FC = () => {
 };
 
 export default Layout;
+

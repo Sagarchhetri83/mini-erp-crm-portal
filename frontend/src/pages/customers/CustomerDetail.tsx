@@ -131,7 +131,7 @@ const CustomerDetail: React.FC = () => {
               Contact Information
             </h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="grid-responsive-2">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                 <Phone size={14} style={{ color: 'var(--text-muted)', marginTop: '3px', flexShrink: 0 }} />
                 <div className="detail-field">
@@ -183,7 +183,7 @@ const CustomerDetail: React.FC = () => {
             <h3 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '16px' }}>
               Business Classification
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+            <div className="grid-responsive-3">
               <div className="detail-field">
                 <div className="label">Customer Type</div>
                 <div className="value"><span className="badge badge-secondary">{customer.customerType}</span></div>
@@ -273,3 +273,4 @@ const CustomerDetail: React.FC = () => {
 };
 
 export default CustomerDetail;
+
