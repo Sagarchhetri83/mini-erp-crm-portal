@@ -1,4 +1,4 @@
-<img width="1869" height="926" alt="image" src="https://github.com/user-attachments/assets/b78fb35d-c939-4a54-aee1-d1a29785c70b" />
+<img width="1846" height="923" alt="image" src="https://github.com/user-attachments/assets/f56913f3-6046-4e89-8513-9b03c8344ba1" />
 
 ## Mini ERP + CRM Operations Portal
 
