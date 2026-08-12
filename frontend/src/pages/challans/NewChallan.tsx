@@ -42,9 +42,9 @@ const NewChallan: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Fetch all active customers and products for the dropdowns
+    // Fetch all customers and products for the dropdowns
     Promise.all([
-      api.get('/customers?limit=1000&status=ACTIVE'),
+      api.get('/customers?limit=1000'),
       api.get('/products?limit=1000')
     ]).then(([custRes, prodRes]) => {
       setCustomers(custRes.data.data);
