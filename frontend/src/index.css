@@ -663,6 +663,93 @@ tbody tr:hover {
   outline: none;
 }
 
+/* Dashboard KPI Specific */
+.dashboard-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  min-width: 0;
+}
+
+.dashboard-kpi-card {
+  background: #FFFFFF;
+  border: 1px solid #ECEAE5;
+  border-radius: 10px;
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 0;
+}
+
+.dashboard-kpi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.dashboard-kpi-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-align: center;
+  word-break: normal;
+  overflow-wrap: normal;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.dashboard-kpi-value {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-kpi-grid {
+    /* Override tablet and go to 4 columns on mobile for compactness */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .dashboard-kpi-card {
+    padding: 10px 4px;
+    min-height: 115px;
+    border-radius: 8px;
+  }
+  .dashboard-kpi-icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 6px;
+  }
+  .dashboard-kpi-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .dashboard-kpi-label {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  .dashboard-kpi-value {
+    font-size: 22px;
+  }
+}
+
 @media (max-width: 640px) {
   .user-filter-bar {
     flex-wrap: wrap;
@@ -899,33 +986,42 @@ html, body {
   div[style*="grid-template-columns: 1fr 1fr"] {
     grid-template-columns: 1fr !important;
   }
-  
-  .hide-on-mobile {
-    display: none !important;
-  }
-  
-  .desktop-only {
-    display: none !important;
-  }
+}
 
-  .mobile-only {
-    display: block !important;
-  }
+/* --- RESPONSIVE VISIBILITY ARCHITECTURE --- */
+/* DEFAULT = DESKTOP */
+.mobile-only {
+  display: none;
 }
 
 .desktop-only {
   display: block;
 }
 
-.mobile-only {
+/* Mobile Data Cards */
+.mobile-data-list {
   display: none;
 }
 
-/* Mobile Data Cards */
-.mobile-data-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+@media (max-width: 640px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  .mobile-only.mobile-data-list,
+  .mobile-data-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
 .mobile-data-card {

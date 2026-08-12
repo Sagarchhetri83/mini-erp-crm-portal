@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MoreHorizontal, ArrowUpRight, TrendingUp } from 'lucide-react';
+import { MoreHorizontal, ArrowUpRight, TrendingUp, Users, Package, FileText, AlertTriangle } from 'lucide-react';
 import { useDashboardStats } from './useDashboardStats';
 
 const AdminDashboard: React.FC = () => {
@@ -36,52 +36,52 @@ const AdminDashboard: React.FC = () => {
           <h1 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.3px' }}>
             Dashboard
           </h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, marginBottom: '8px' }}>
             Overview of your business operations and real-time ERP performance.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-secondary" style={{ fontSize: '12px', height: '32px' }}>
-            <TrendingUp size={14} /> Export Report
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button className="btn btn-secondary" style={{ fontSize: '13px', height: '36px', padding: '0 12px' }}>
+            <TrendingUp size={16} /> Export Report
           </button>
-          <Link to="/admin/challans/new" className="btn btn-primary" style={{ fontSize: '12px', height: '32px' }}>
+          <Link to="/admin/challans/new" className="btn btn-primary" style={{ fontSize: '13px', height: '36px', padding: '0 12px' }}>
             + New Challan
           </Link>
         </div>
       </div>
 
       {/* ROW 1: 4 COMPACT KPI CARDS */}
-      <div className="kpi-strip">
-        <div className="kpi-card">
-          <div className="kpi-header">
-            <span className="kpi-label">Total Customers</span>
-            <MoreHorizontal size={16} style={{ color: 'var(--text-muted)', cursor: 'pointer' }} />
+      <div className="dashboard-kpi-grid">
+        <div className="dashboard-kpi-card">
+          <div className="dashboard-kpi-icon" style={{ background: '#EDE9FE', color: '#7C3AED' }}>
+            <Users size={18} />
           </div>
-          <div className="kpi-value">{metrics.totalCustomers}</div>
+          <div className="dashboard-kpi-label">Total<br/>Customers</div>
+          <div className="dashboard-kpi-value">{metrics.totalCustomers}</div>
         </div>
         
-        <div className="kpi-card">
-          <div className="kpi-header">
-            <span className="kpi-label">Total Products</span>
-            <MoreHorizontal size={16} style={{ color: 'var(--text-muted)', cursor: 'pointer' }} />
+        <div className="dashboard-kpi-card">
+          <div className="dashboard-kpi-icon" style={{ background: '#DBEAFE', color: '#2563EB' }}>
+            <Package size={18} />
           </div>
-          <div className="kpi-value">{metrics.totalProducts}</div>
+          <div className="dashboard-kpi-label">Total<br/>Products</div>
+          <div className="dashboard-kpi-value">{metrics.totalProducts}</div>
         </div>
         
-        <div className="kpi-card">
-          <div className="kpi-header">
-            <span className="kpi-label">Sales Challans</span>
-            <MoreHorizontal size={16} style={{ color: 'var(--text-muted)', cursor: 'pointer' }} />
+        <div className="dashboard-kpi-card">
+          <div className="dashboard-kpi-icon" style={{ background: '#DCFCE7', color: '#16A34A' }}>
+            <FileText size={18} />
           </div>
-          <div className="kpi-value">{metrics.totalChallans}</div>
+          <div className="dashboard-kpi-label">Sales<br/>Challans</div>
+          <div className="dashboard-kpi-value">{metrics.totalChallans}</div>
         </div>
 
-        <div className="kpi-card">
-          <div className="kpi-header">
-            <span className="kpi-label">Low Stock</span>
-            <MoreHorizontal size={16} style={{ color: 'var(--text-muted)', cursor: 'pointer' }} />
+        <div className="dashboard-kpi-card">
+          <div className="dashboard-kpi-icon" style={{ background: '#FEF3C7', color: '#D97706' }}>
+            <AlertTriangle size={18} />
           </div>
-          <div className="kpi-value" style={{ color: metrics.lowStockCount > 0 ? 'var(--warning)' : 'var(--text-primary)' }}>
+          <div className="dashboard-kpi-label">Low<br/>Stock</div>
+          <div className="dashboard-kpi-value" style={{ color: metrics.lowStockCount > 0 ? 'var(--warning)' : 'var(--text-primary)' }}>
             {metrics.lowStockCount}
           </div>
         </div>
@@ -161,9 +161,9 @@ const AdminDashboard: React.FC = () => {
             <MoreHorizontal size={16} style={{ color: 'var(--text-muted)', cursor: 'pointer' }} />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: '200px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10%', minHeight: '180px', padding: '10px 0' }}>
             {/* SVG Donut Chart */}
-            <div style={{ position: 'relative', width: '150px', height: '150px' }}>
+            <div style={{ position: 'relative', width: '130px', height: '130px', flexShrink: 0 }}>
               <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
                 {/* Background Ring */}
                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ECEAE5" strokeWidth="3.8" />
@@ -186,7 +186,7 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Compact Legend */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '100px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#16A34A' }}></div>
                 <span style={{ color: 'var(--text-secondary)' }}>In Stock:</span>
