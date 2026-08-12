@@ -64,7 +64,7 @@ const ProductList: React.FC = () => {
 
   return (
     <div>
-      <div className="page-header" style={{ marginBottom: '16px' }}>
+      <div className="page-header" style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 className="page-title">Products & Inventory</h1>
         </div>
@@ -75,7 +75,7 @@ const ProductList: React.FC = () => {
         )}
       </div>
 
-      <div className="toolbar" style={{ marginBottom: '12px' }}>
+      <div className="toolbar" style={{ marginBottom: '12px', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
         <div className="search-box">
           <Search size={14} />
           <input
@@ -117,81 +117,156 @@ const ProductList: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>PRODUCT</th>
-                <th>SKU</th>
-                <th>CATEGORY</th>
-                <th style={{ textAlign: 'right' }}>PRICE</th>
-                <th style={{ textAlign: 'right' }}>CURRENT STOCK</th>
-                <th style={{ textAlign: 'right' }}>MIN STOCK</th>
-                <th>STATUS</th>
-                <th>LOCATION</th>
-                <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => {
-                const isLowStock = p.stock <= p.minStock && p.stock > 0;
-                const isOutOfStock = p.stock === 0;
-                let statusClass = 'status-in-stock';
-                let statusText = 'In Stock';
+        <>
+          <div className="table-wrapper desktop-only">
+            <table>
+              <thead>
+                <tr>
+                  <th>PRODUCT</th>
+                  <th>SKU</th>
+                  <th>CATEGORY</th>
+                  <th style={{ textAlign: 'right' }}>PRICE</th>
+                  <th style={{ textAlign: 'right' }}>CURRENT STOCK</th>
+                  <th style={{ textAlign: 'right' }}>MIN STOCK</th>
+                  <th>STATUS</th>
+                  <th>LOCATION</th>
+                  <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((p) => {
+                  const isLowStock = p.stock <= p.minStock && p.stock > 0;
+                  const isOutOfStock = p.stock === 0;
+                  let statusClass = 'status-in-stock';
+                  let statusText = 'In Stock';
 
-                if (isOutOfStock) {
-                  statusClass = 'status-out-of-stock';
-                  statusText = 'Out of Stock';
-                } else if (isLowStock) {
-                  statusClass = 'status-low-stock';
-                  statusText = 'Low Stock';
-                }
+                  if (isOutOfStock) {
+                    statusClass = 'status-out-of-stock';
+                    statusText = 'Out of Stock';
+                  } else if (isLowStock) {
+                    statusClass = 'status-low-stock';
+                    statusText = 'Low Stock';
+                  }
 
-                return (
-                  <tr key={p.id}>
-                    <td>
-                      <div className="table-avatar-cell">
-                        <div className="avatar-initial" style={{ background: 'transparent' }}>
-                          <Box size={16} style={{ color: 'var(--text-muted)' }} />
+                  return (
+                    <tr key={p.id}>
+                      <td>
+                        <div className="table-avatar-cell">
+                          <div className="avatar-initial" style={{ background: 'transparent' }}>
+                            <Box size={16} style={{ color: 'var(--text-muted)' }} />
+                          </div>
+                          <div>
+                            <Link to={`${rolePrefix}/products/${p.id}`} className="cell-title">
+                              {p.name}
+                            </Link>
+                          </div>
                         </div>
-                        <div>
-                          <Link to={`${rolePrefix}/products/${p.id}`} className="cell-title">
-                            {p.name}
-                          </Link>
+                      </td>
+                      <td style={{ fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{p.sku}</td>
+                      <td>{p.category || '—'}</td>
+                      <td style={{ textAlign: 'right', fontWeight: 500 }}>₹{p.price.toFixed(2)}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        {p.stock} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.unit}</span>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        {p.minStock} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.unit}</span>
+                      </td>
+                      <td>
+                        <div className={`status-dot ${statusClass}`}>
+                          {statusText}
+                        </div>
+                      </td>
+                      <td>{p.location || '—'}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                          <button
+                            className="btn-icon"
+                            title="View Details"
+                            onClick={() => navigate(`${rolePrefix}/products/${p.id}`)}
+                          >
+                            <MoreVertical size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mobile-data-list mobile-only">
+            {products.map((p) => {
+              const isLowStock = p.stock <= p.minStock && p.stock > 0;
+              const isOutOfStock = p.stock === 0;
+              let statusClass = 'status-in-stock';
+              let statusText = 'In Stock';
+
+              if (isOutOfStock) {
+                statusClass = 'status-out-of-stock';
+                statusText = 'Out of Stock';
+              } else if (isLowStock) {
+                statusClass = 'status-low-stock';
+                statusText = 'Low Stock';
+              }
+
+              return (
+                <div className="mobile-data-card" key={p.id}>
+                  <div className="mobile-data-card-header">
+                    <div className="table-avatar-cell" style={{ flex: 1, minWidth: 0 }}>
+                      <div className="avatar-initial" style={{ background: 'transparent' }}>
+                        <Box size={16} style={{ color: 'var(--text-muted)' }} />
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <Link to={`${rolePrefix}/products/${p.id}`} className="mobile-data-card-title" style={{ display: 'block', textDecoration: 'none' }}>
+                          {p.name}
+                        </Link>
+                        <div className="mobile-data-card-subtitle" style={{ fontFamily: 'monospace' }}>
+                          {p.sku}
                         </div>
                       </div>
-                    </td>
-                    <td style={{ fontFamily: 'monospace', color: 'var(--text-secondary)' }}>{p.sku}</td>
-                    <td>{p.category || '—'}</td>
-                    <td style={{ textAlign: 'right', fontWeight: 500 }}>₹{p.price.toFixed(2)}</td>
-                    <td style={{ textAlign: 'right' }}>
-                      {p.stock} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.unit}</span>
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      {p.minStock} <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.unit}</span>
-                    </td>
-                    <td>
-                      <div className={`status-dot ${statusClass}`}>
-                        {statusText}
-                      </div>
-                    </td>
-                    <td>{p.location || '—'}</td>
-                    <td style={{ textAlign: 'right' }}>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <button
-                          className="btn-icon"
-                          title="View Details"
-                          onClick={() => navigate(`${rolePrefix}/products/${p.id}`)}
-                        >
-                          <MoreVertical size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </div>
+                    <button
+                      className="btn-icon"
+                      title="View Details"
+                      onClick={() => navigate(`${rolePrefix}/products/${p.id}`)}
+                      style={{ flexShrink: 0 }}
+                    >
+                      <MoreVertical size={14} />
+                    </button>
+                  </div>
+
+                  <div className="mobile-data-card-grid">
+                    <div>
+                      <div className="mobile-data-card-label">Category</div>
+                      <div className="mobile-data-card-value">{p.category || '—'}</div>
+                    </div>
+                    <div>
+                      <div className="mobile-data-card-label">Price</div>
+                      <div className="mobile-data-card-value">₹{p.price.toFixed(2)}</div>
+                    </div>
+                    <div>
+                      <div className="mobile-data-card-label">Stock</div>
+                      <div className="mobile-data-card-value">{p.stock} {p.unit}</div>
+                    </div>
+                    <div>
+                      <div className="mobile-data-card-label">Min Stock</div>
+                      <div className="mobile-data-card-value">{p.minStock} {p.unit}</div>
+                    </div>
+                  </div>
+
+                  <div className="mobile-data-card-badges">
+                    <div className={`status-dot ${statusClass}`}>
+                      {statusText}
+                    </div>
+                    {p.location && (
+                      <span className="badge badge-secondary">{p.location}</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
           <div className="pagination-wrapper">
             <span className="pagination-info">
@@ -209,7 +284,7 @@ const ProductList: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -272,17 +272,17 @@ const UsersPlaceholder: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* 1. HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.3px' }}>
             User Management
           </h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, marginBottom: '12px' }}>
             Manage MiniERP users, roles, and access.
           </p>
         </div>
 
-        <button className="btn btn-primary" onClick={openAddModal} style={{ fontSize: '13px', height: '36px', gap: '6px' }}>
+        <button className="btn btn-primary" onClick={openAddModal} style={{ fontSize: '13px', height: '40px', gap: '6px' }}>
           <Plus size={16} /> Add User
         </button>
       </div>
@@ -307,8 +307,8 @@ const UsersPlaceholder: React.FC = () => {
       )}
 
       {/* 2. SUMMARY KPI CARDS */}
-      <div className="kpi-strip">
-        <div className="kpi-card">
+      <div className="user-kpi-grid">
+        <div className="user-kpi-card">
           <div className="kpi-header">
             <span className="kpi-label">Total Users</span>
             <UsersIcon size={16} style={{ color: 'var(--primary)' }} />
@@ -316,7 +316,7 @@ const UsersPlaceholder: React.FC = () => {
           <div className="kpi-value">{summary.total}</div>
         </div>
 
-        <div className="kpi-card">
+        <div className="user-kpi-card">
           <div className="kpi-header">
             <span className="kpi-label">Active Users</span>
             <UserCheck size={16} style={{ color: 'var(--success)' }} />
@@ -324,7 +324,7 @@ const UsersPlaceholder: React.FC = () => {
           <div className="kpi-value">{summary.active}</div>
         </div>
 
-        <div className="kpi-card">
+        <div className="user-kpi-card">
           <div className="kpi-header">
             <span className="kpi-label">Inactive Users</span>
             <UserX size={16} style={{ color: 'var(--text-muted)' }} />
@@ -332,7 +332,7 @@ const UsersPlaceholder: React.FC = () => {
           <div className="kpi-value">{summary.inactive}</div>
         </div>
 
-        <div className="kpi-card">
+        <div className="user-kpi-card">
           <div className="kpi-header">
             <span className="kpi-label">Admin Users</span>
             <ShieldCheck size={16} style={{ color: 'var(--primary)' }} />
@@ -342,8 +342,8 @@ const UsersPlaceholder: React.FC = () => {
       </div>
 
       {/* 3. TOOLBAR (SEARCH + FILTERS) */}
-      <div className="card" style={{ padding: '12px 16px', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <div className="search-box" style={{ flex: 1, minWidth: '220px', height: '36px', background: '#FAFAF8' }}>
+      <div className="card user-filter-bar" style={{ padding: '14px 16px' }}>
+        <div className="search-box user-filter-search" style={{ background: '#FAFAF8' }}>
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
           <input 
             type="text" 
@@ -356,7 +356,7 @@ const UsersPlaceholder: React.FC = () => {
         <select 
           value={roleFilter} 
           onChange={(e) => setRoleFilter(e.target.value)}
-          style={{ height: '36px', padding: '0 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: '#FAFAF8', fontSize: '13px', color: 'var(--text-primary)', outline: 'none' }}
+          className="user-filter-select"
         >
           <option value="">All Roles</option>
           <option value="ADMIN">Admin</option>
@@ -368,7 +368,7 @@ const UsersPlaceholder: React.FC = () => {
         <select 
           value={statusFilter} 
           onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ height: '36px', padding: '0 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: '#FAFAF8', fontSize: '13px', color: 'var(--text-primary)', outline: 'none' }}
+          className="user-filter-select"
         >
           <option value="">All Statuses</option>
           <option value="ACTIVE">Active</option>
@@ -395,7 +395,7 @@ const UsersPlaceholder: React.FC = () => {
         </div>
       ) : (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div className="table-wrapper" style={{ border: 'none', margin: 0, borderRadius: 0 }}>
+          <div className="table-wrapper desktop-only" style={{ border: 'none', margin: 0, borderRadius: 0 }}>
             <table style={{ margin: 0 }}>
               <thead>
                 <tr style={{ background: '#FAFAF8' }}>
@@ -470,6 +470,65 @@ const UsersPlaceholder: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="mobile-data-list mobile-only" style={{ padding: '16px' }}>
+            {users.map((u) => (
+              <div className="mobile-data-card" key={u.id}>
+                <div className="mobile-data-card-header" style={{ position: 'relative' }}>
+                  <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: 0 }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 'bold', flexShrink: 0 }}>
+                      {u.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div className="mobile-data-card-title">{u.name}</div>
+                      <div className="mobile-data-card-subtitle" style={{ overflowWrap: 'break-word' }}>{u.email}</div>
+                    </div>
+                  </div>
+                  <button 
+                    className="btn-icon" 
+                    onClick={() => setActiveMenuId(activeMenuId === u.id ? null : u.id)}
+                    style={{ flexShrink: 0 }}
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+
+                  {/* Dropdown Action Menu */}
+                  {activeMenuId === u.id && (
+                    <div style={{
+                      position: 'absolute', top: '32px', right: 0, width: '160px',
+                      background: '#FFFFFF', border: '1px solid #ECEAE5', borderRadius: '8px',
+                      boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', zIndex: 999, overflow: 'hidden',
+                      padding: '4px 0', textAlign: 'left'
+                    }}>
+                      <button onClick={() => openViewModal(u)} style={{ width: '100%', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-primary)', cursor: 'pointer' }}>
+                        <Eye size={14} /> View
+                      </button>
+                      <button onClick={() => openEditModal(u)} style={{ width: '100%', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-primary)', cursor: 'pointer' }}>
+                        <Edit size={14} /> Edit
+                      </button>
+                      <button onClick={() => openResetModal(u)} style={{ width: '100%', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-primary)', cursor: 'pointer' }}>
+                        <Key size={14} /> Reset Password
+                      </button>
+                      <button onClick={() => handleToggleStatus(u)} style={{ width: '100%', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: u.status === 'ACTIVE' ? 'var(--warning)' : 'var(--success)', cursor: 'pointer' }}>
+                        {u.status === 'ACTIVE' ? <UserX size={14} /> : <UserCheck size={14} />} {u.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <div style={{ borderTop: '1px solid #ECEAE5', margin: '4px 0' }} />
+                      <button onClick={() => handleDeleteUser(u)} style={{ width: '100%', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--danger)', cursor: 'pointer', fontWeight: 500 }}>
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="mobile-data-card-badges">
+                  <span className="badge badge-secondary" style={{ fontWeight: 600 }}>{u.role}</span>
+                  <span className={`badge ${u.status === 'ACTIVE' ? 'badge-success' : 'badge-error'}`}>
+                    {u.status}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

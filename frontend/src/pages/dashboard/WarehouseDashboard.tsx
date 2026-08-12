@@ -68,34 +68,64 @@ const WarehouseDashboard: React.FC = () => {
             {data.lowStockProducts.length === 0 ? (
               <div className="empty-state">All products are sufficiently stocked.</div>
             ) : (
-              <div className="table-wrapper" style={{ border: 'none', borderRadius: 0, margin: 0 }}>
-                <table style={{ margin: 0 }}>
-                  <thead>
-                    <tr style={{ background: 'var(--bg-app)' }}>
-                      <th>PRODUCT / SKU</th>
-                      <th>CURRENT STOCK</th>
-                      <th>MIN ALERT</th>
-                      <th>STATUS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.lowStockProducts.map((p) => (
-                      <tr key={p.id}>
-                        <td style={{ fontWeight: 500 }}>
-                          <Link to={`/warehouse/products/${p.id}`}>{p.name} ({p.sku})</Link>
-                        </td>
-                        <td style={{ fontWeight: 600 }}>{p.stock}</td>
-                        <td>{p.minStock}</td>
-                        <td>
-                          <span className={`badge ${p.stock === 0 ? 'badge-error' : 'badge-warning'}`}>
-                            {p.stock === 0 ? 'Out of Stock' : 'Low Stock'}
-                          </span>
-                        </td>
+              <>
+                <div className="table-wrapper desktop-only" style={{ border: 'none', borderRadius: 0, margin: 0 }}>
+                  <table style={{ margin: 0 }}>
+                    <thead>
+                      <tr style={{ background: 'var(--bg-app)' }}>
+                        <th>PRODUCT / SKU</th>
+                        <th>CURRENT STOCK</th>
+                        <th>MIN ALERT</th>
+                        <th>STATUS</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {data.lowStockProducts.map((p) => (
+                        <tr key={p.id}>
+                          <td style={{ fontWeight: 500 }}>
+                            <Link to={`/warehouse/products/${p.id}`}>{p.name} ({p.sku})</Link>
+                          </td>
+                          <td style={{ fontWeight: 600 }}>{p.stock}</td>
+                          <td>{p.minStock}</td>
+                          <td>
+                            <span className={`badge ${p.stock === 0 ? 'badge-error' : 'badge-warning'}`}>
+                              {p.stock === 0 ? 'Out of Stock' : 'Low Stock'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mobile-data-list mobile-only" style={{ padding: '16px' }}>
+                  {data.lowStockProducts.map((p) => (
+                    <div className="mobile-data-card" key={p.id}>
+                      <div className="mobile-data-card-header" style={{ marginBottom: '8px' }}>
+                        <div>
+                          <Link to={`/warehouse/products/${p.id}`} className="mobile-data-card-title" style={{ display: 'block', textDecoration: 'none' }}>
+                            {p.name}
+                          </Link>
+                          <div className="mobile-data-card-subtitle" style={{ fontFamily: 'monospace' }}>{p.sku}</div>
+                        </div>
+                        <span className={`badge ${p.stock === 0 ? 'badge-error' : 'badge-warning'}`}>
+                          {p.stock === 0 ? 'Out of Stock' : 'Low Stock'}
+                        </span>
+                      </div>
+                      <div className="mobile-data-card-grid" style={{ marginTop: '0' }}>
+                        <div>
+                          <div className="mobile-data-card-label">Current Stock</div>
+                          <div className="mobile-data-card-value" style={{ fontWeight: 600 }}>{p.stock}</div>
+                        </div>
+                        <div>
+                          <div className="mobile-data-card-label">Min Alert</div>
+                          <div className="mobile-data-card-value">{p.minStock}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>

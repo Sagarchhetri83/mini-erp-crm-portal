@@ -490,32 +490,61 @@ const AnalyticsContainer: React.FC = () => {
               <span>Recent Sales Transactions</span>
             </div>
             
-            <div className="table-wrapper" style={{ border: 'none', margin: 0, borderRadius: 0 }}>
-              <table style={{ margin: 0 }}>
-                <thead>
-                  <tr style={{ background: '#FAFAF8' }}>
-                    <th style={{ paddingLeft: '20px' }}>CHALLAN NO</th>
-                    <th>CUSTOMER</th>
-                    <th>DATE</th>
-                    <th style={{ textAlign: 'right' }}>AMOUNT</th>
-                    <th style={{ paddingRight: '20px' }}>STATUS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentChallans.slice(0, 6).map(c => (
-                    <tr key={c.id}>
-                      <td style={{ paddingLeft: '20px', fontWeight: 600 }}>{c.challanNo}</td>
-                      <td>{c.customer?.name}</td>
-                      <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-                      <td style={{ textAlign: 'right', fontWeight: 600 }}>₹{c.totalAmount.toFixed(2)}</td>
-                      <td style={{ paddingRight: '20px' }}>
-                        <span className={`badge badge-${c.status.toLowerCase()}`}>{c.status}</span>
-                      </td>
+            <>
+              <div className="table-wrapper desktop-only" style={{ border: 'none', margin: 0, borderRadius: 0 }}>
+                <table style={{ margin: 0 }}>
+                  <thead>
+                    <tr style={{ background: '#FAFAF8' }}>
+                      <th style={{ paddingLeft: '20px' }}>CHALLAN NO</th>
+                      <th>CUSTOMER</th>
+                      <th>DATE</th>
+                      <th style={{ textAlign: 'right' }}>AMOUNT</th>
+                      <th style={{ paddingRight: '20px' }}>STATUS</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {recentChallans.slice(0, 6).map(c => (
+                      <tr key={c.id}>
+                        <td style={{ paddingLeft: '20px', fontWeight: 600 }}>{c.challanNo}</td>
+                        <td>{c.customer?.name}</td>
+                        <td>{new Date(c.createdAt).toLocaleDateString()}</td>
+                        <td style={{ textAlign: 'right', fontWeight: 600 }}>₹{c.totalAmount.toFixed(2)}</td>
+                        <td style={{ paddingRight: '20px' }}>
+                          <span className={`badge badge-${c.status.toLowerCase()}`}>{c.status}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mobile-data-list mobile-only" style={{ padding: '16px' }}>
+                {recentChallans.slice(0, 6).map((c) => (
+                  <div className="mobile-data-card" key={c.id}>
+                    <div className="mobile-data-card-header" style={{ marginBottom: '8px' }}>
+                      <div className="mobile-data-card-title" style={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                        {c.challanNo}
+                      </div>
+                      <span className={`badge badge-${c.status.toLowerCase()}`}>{c.status}</span>
+                    </div>
+                    <div className="mobile-data-card-grid" style={{ marginTop: '0' }}>
+                      <div>
+                        <div className="mobile-data-card-label">Customer</div>
+                        <div className="mobile-data-card-value">{c.customer?.name}</div>
+                      </div>
+                      <div>
+                        <div className="mobile-data-card-label">Amount</div>
+                        <div className="mobile-data-card-value">₹{c.totalAmount.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="mobile-data-card-label">Date</div>
+                        <div className="mobile-data-card-value">{new Date(c.createdAt).toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           </div>
         </div>
 

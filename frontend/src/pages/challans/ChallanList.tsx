@@ -71,7 +71,7 @@ const ChallanList: React.FC = () => {
 
   return (
     <div>
-      <div className="page-header" style={{ marginBottom: '16px' }}>
+      <div className="page-header" style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 className="page-title">Sales Challans</h1>
         </div>
@@ -82,7 +82,7 @@ const ChallanList: React.FC = () => {
         )}
       </div>
 
-      <div className="toolbar" style={{ marginBottom: '12px' }}>
+      <div className="toolbar" style={{ marginBottom: '12px', display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
         <div className="search-box">
           <Search size={14} />
           <input
@@ -124,50 +124,97 @@ const ChallanList: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>CHALLAN</th>
-                <th>CUSTOMER</th>
-                <th>DATE</th>
-                <th style={{ textAlign: 'right' }}>AMOUNT</th>
-                <th>STATUS</th>
-                <th>CREATED BY</th>
-                <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {challans.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    <Link to={`${rolePrefix}/challans/${c.id}`} style={{ fontWeight: 500, fontFamily: 'monospace' }}>
+        <>
+          <div className="table-wrapper desktop-only">
+            <table>
+              <thead>
+                <tr>
+                  <th>CHALLAN</th>
+                  <th>CUSTOMER</th>
+                  <th>DATE</th>
+                  <th style={{ textAlign: 'right' }}>AMOUNT</th>
+                  <th>STATUS</th>
+                  <th>CREATED BY</th>
+                  <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {challans.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      <Link to={`${rolePrefix}/challans/${c.id}`} style={{ fontWeight: 500, fontFamily: 'monospace' }}>
+                        {c.challanNo}
+                      </Link>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 500 }}>{c.customer.name}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{c.customer.mobile}</div>
+                    </td>
+                    <td>{new Date(c.createdAt).toLocaleDateString()}</td>
+                    <td style={{ fontWeight: 500, textAlign: 'right' }}>₹{c.totalAmount.toFixed(2)}</td>
+                    <td>{getStatusBadge(c.status)}</td>
+                    <td style={{ color: 'var(--text-secondary)' }}>{c.createdBy.name}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                          className="btn-icon"
+                          title="View Details"
+                          onClick={() => navigate(`${rolePrefix}/challans/${c.id}`)}
+                        >
+                          <MoreVertical size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mobile-data-list mobile-only">
+            {challans.map((c) => (
+              <div className="mobile-data-card" key={c.id}>
+                <div className="mobile-data-card-header">
+                  <div>
+                    <Link to={`${rolePrefix}/challans/${c.id}`} className="mobile-data-card-title" style={{ fontFamily: 'monospace', textDecoration: 'none' }}>
                       {c.challanNo}
                     </Link>
-                  </td>
-                  <td>
-                    <div style={{ fontWeight: 500 }}>{c.customer.name}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{c.customer.mobile}</div>
-                  </td>
-                  <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-                  <td style={{ fontWeight: 500, textAlign: 'right' }}>₹{c.totalAmount.toFixed(2)}</td>
-                  <td>{getStatusBadge(c.status)}</td>
-                  <td style={{ color: 'var(--text-secondary)' }}>{c.createdBy.name}</td>
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <button
-                        className="btn-icon"
-                        title="View Details"
-                        onClick={() => navigate(`${rolePrefix}/challans/${c.id}`)}
-                      >
-                        <MoreVertical size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                  <button
+                    className="btn-icon"
+                    title="View Details"
+                    onClick={() => navigate(`${rolePrefix}/challans/${c.id}`)}
+                    style={{ flexShrink: 0 }}
+                  >
+                    <MoreVertical size={14} />
+                  </button>
+                </div>
+
+                <div className="mobile-data-card-grid">
+                  <div>
+                    <div className="mobile-data-card-label">Customer</div>
+                    <div className="mobile-data-card-value">{c.customer.name}</div>
+                  </div>
+                  <div>
+                    <div className="mobile-data-card-label">Date</div>
+                    <div className="mobile-data-card-value">{new Date(c.createdAt).toLocaleDateString()}</div>
+                  </div>
+                  <div>
+                    <div className="mobile-data-card-label">Amount</div>
+                    <div className="mobile-data-card-value">₹{c.totalAmount.toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className="mobile-data-card-label">Created By</div>
+                    <div className="mobile-data-card-value">{c.createdBy.name}</div>
+                  </div>
+                </div>
+
+                <div className="mobile-data-card-badges">
+                  {getStatusBadge(c.status)}
+                </div>
+              </div>
+            ))}
+          </div>
 
           <div className="pagination-wrapper">
             <span className="pagination-info">
@@ -185,7 +232,7 @@ const ChallanList: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

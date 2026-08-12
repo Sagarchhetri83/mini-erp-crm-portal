@@ -576,6 +576,36 @@ tbody tr:hover {
   letter-spacing: -0.5px;
 }
 
+/* User Management Specific KPIs */
+.user-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.user-kpi-card {
+  background: #FFFFFF;
+  border: 1px solid #ECEAE5;
+  border-radius: 10px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (max-width: 1199px) {
+  .user-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .user-kpi-card {
+    min-width: 0;
+    padding: 14px;
+    min-height: 120px;
+  }
+}
+
 /* Toolbar */
 .toolbar {
   display: flex;
@@ -609,6 +639,45 @@ tbody tr:hover {
 
 .search-box input:focus {
   outline: none;
+}
+
+/* User Filter Bar */
+.user-filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.user-filter-search {
+  flex: 1;
+  min-width: 220px;
+}
+.user-filter-select {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: #FAFAF8;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+@media (max-width: 640px) {
+  .user-filter-bar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .user-filter-search {
+    flex: 1 1 100%;
+    min-width: 0;
+    height: 40px;
+  }
+  .user-filter-select {
+    flex: 1 1 calc(50% - 5px);
+    min-width: 0;
+    height: 40px;
+  }
 }
 
 /* Details Pages */
@@ -834,6 +903,90 @@ html, body {
   .hide-on-mobile {
     display: none !important;
   }
+  
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+}
+
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* Mobile Data Cards */
+.mobile-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-data-card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.mobile-data-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mobile-data-card-title {
+  min-width: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: normal;
+  overflow-wrap: normal;
+}
+
+.mobile-data-card-subtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.mobile-data-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin-top: 12px;
+}
+
+.mobile-data-card-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.mobile-data-card-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: normal;
+  overflow-wrap: normal;
+}
+
+.mobile-data-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
 }
 
 @media (max-width: 640px) {

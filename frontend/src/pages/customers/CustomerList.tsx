@@ -73,7 +73,7 @@ const CustomerList: React.FC = () => {
 
   return (
     <div>
-      <div className="page-header" style={{ marginBottom: '16px' }}>
+      <div className="page-header" style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 className="page-title">Customers</h1>
         </div>
@@ -137,61 +137,109 @@ const CustomerList: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>CUSTOMER</th>
-                <th>MOBILE</th>
-                <th>BUSINESS</th>
-                <th>TYPE</th>
-                <th>STATUS</th>
-                <th>FOLLOW-UP</th>
-                <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    <div className="table-avatar-cell">
-                      <div className="avatar-initial">
-                        {c.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <Link to={`${rolePrefix}/customers/${c.id}`} className="cell-title">
-                          {c.name}
-                        </Link>
-                        {c.email && (
-                          <div className="cell-subtitle">{c.email}</div>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{c.mobile}</td>
-                  <td>{c.businessName || '—'}</td>
-                  <td>{getTypeBadge(c.customerType)}</td>
-                  <td>{getStatusBadge(c.status)}</td>
-                  <td style={{ color: 'var(--text-secondary)' }}>
-                    {c.followUpDate
-                      ? new Date(c.followUpDate).toLocaleDateString()
-                      : '—'}
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <button
-                        className="btn-icon"
-                        title="View Details"
-                        onClick={() => navigate(`${rolePrefix}/customers/${c.id}`)}
-                      >
-                        <MoreVertical size={14} />
-                      </button>
-                    </div>
-                  </td>
+        <>
+          <div className="table-wrapper desktop-only">
+            <table>
+              <thead>
+                <tr>
+                  <th>CUSTOMER</th>
+                  <th>MOBILE</th>
+                  <th>BUSINESS</th>
+                  <th>TYPE</th>
+                  <th>STATUS</th>
+                  <th>FOLLOW-UP</th>
+                  <th style={{ textAlign: 'right', width: '60px' }}>ACTIONS</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {customers.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      <div className="table-avatar-cell">
+                        <div className="avatar-initial">
+                          {c.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <Link to={`${rolePrefix}/customers/${c.id}`} className="cell-title">
+                            {c.name}
+                          </Link>
+                          {c.email && (
+                            <div className="cell-subtitle">{c.email}</div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td>{c.mobile}</td>
+                    <td>{c.businessName || '—'}</td>
+                    <td>{getTypeBadge(c.customerType)}</td>
+                    <td>{getStatusBadge(c.status)}</td>
+                    <td style={{ color: 'var(--text-secondary)' }}>
+                      {c.followUpDate
+                        ? new Date(c.followUpDate).toLocaleDateString()
+                        : '—'}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                          className="btn-icon"
+                          title="View Details"
+                          onClick={() => navigate(`${rolePrefix}/customers/${c.id}`)}
+                        >
+                          <MoreVertical size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mobile-data-list mobile-only">
+            {customers.map((c) => (
+              <div className="mobile-data-card" key={c.id}>
+                <div className="mobile-data-card-header">
+                  <div className="table-avatar-cell" style={{ flex: 1, minWidth: 0 }}>
+                    <div className="avatar-initial">
+                      {c.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <Link to={`${rolePrefix}/customers/${c.id}`} className="mobile-data-card-title" style={{ display: 'block', textDecoration: 'none' }}>
+                        {c.name}
+                      </Link>
+                      {c.email && (
+                        <div className="mobile-data-card-subtitle" style={{ overflowWrap: 'break-word' }}>{c.email}</div>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    className="btn-icon"
+                    title="View Details"
+                    onClick={() => navigate(`${rolePrefix}/customers/${c.id}`)}
+                    style={{ flexShrink: 0 }}
+                  >
+                    <MoreVertical size={14} />
+                  </button>
+                </div>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {c.mobile && <div className="mobile-data-card-meta">{c.mobile}</div>}
+                  {c.businessName && <div className="mobile-data-card-meta">{c.businessName}</div>}
+                </div>
+
+                <div className="mobile-data-card-badges">
+                  {getTypeBadge(c.customerType)}
+                  {getStatusBadge(c.status)}
+                </div>
+
+                {c.followUpDate && (
+                  <div className="mobile-data-card-meta" style={{ marginTop: '8px' }}>
+                    Follow-up: {new Date(c.followUpDate).toLocaleDateString()}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
 
           <div className="pagination-wrapper">
             <span className="pagination-info">
@@ -209,7 +257,7 @@ const CustomerList: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -31,7 +31,7 @@ const AdminDashboard: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
       {/* HEADER SECTION */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', letterSpacing: '-0.3px' }}>
             Dashboard
@@ -304,34 +304,63 @@ const AdminDashboard: React.FC = () => {
           {recentChallans.length === 0 ? (
             <div className="empty-state" style={{ padding: '30px' }}>No sales challans recorded yet.</div>
           ) : (
-            <div className="table-wrapper" style={{ border: 'none', borderRadius: 0, margin: 0 }}>
-              <table style={{ margin: 0 }}>
-                <thead>
-                  <tr style={{ background: '#FAFAF8' }}>
-                    <th style={{ paddingLeft: '20px' }}>CHALLAN NO</th>
-                    <th>CUSTOMER</th>
-                    <th>DATE</th>
-                    <th style={{ textAlign: 'right' }}>AMOUNT</th>
-                    <th style={{ paddingRight: '20px' }}>STATUS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentChallans.slice(0, 5).map((c) => (
-                    <tr key={c.id}>
-                      <td style={{ paddingLeft: '20px', fontWeight: 500 }}>
-                        <Link to={`/admin/challans/${c.id}`} style={{ color: 'var(--primary)', textDecoration: 'none' }}>{c.challanNo}</Link>
-                      </td>
-                      <td>{c.customer?.name}</td>
-                      <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-                      <td style={{ fontWeight: 500, textAlign: 'right' }}>₹{c.totalAmount.toFixed(2)}</td>
-                      <td style={{ paddingRight: '20px' }}>
-                        <span className={`badge badge-${c.status.toLowerCase()}`}>{c.status}</span>
-                      </td>
+            <>
+              <div className="table-wrapper desktop-only" style={{ border: 'none', borderRadius: 0, margin: 0 }}>
+                <table style={{ margin: 0 }}>
+                  <thead>
+                    <tr style={{ background: '#FAFAF8' }}>
+                      <th style={{ paddingLeft: '20px' }}>CHALLAN NO</th>
+                      <th>CUSTOMER</th>
+                      <th>DATE</th>
+                      <th style={{ textAlign: 'right' }}>AMOUNT</th>
+                      <th style={{ paddingRight: '20px' }}>STATUS</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {recentChallans.slice(0, 5).map((c) => (
+                      <tr key={c.id}>
+                        <td style={{ paddingLeft: '20px', fontWeight: 500 }}>
+                          <Link to={`/admin/challans/${c.id}`} style={{ color: 'var(--primary)', textDecoration: 'none' }}>{c.challanNo}</Link>
+                        </td>
+                        <td>{c.customer?.name}</td>
+                        <td>{new Date(c.createdAt).toLocaleDateString()}</td>
+                        <td style={{ fontWeight: 500, textAlign: 'right' }}>₹{c.totalAmount.toFixed(2)}</td>
+                        <td style={{ paddingRight: '20px' }}>
+                          <span className={`badge badge-${c.status.toLowerCase()}`}>{c.status}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mobile-data-list mobile-only" style={{ padding: '16px' }}>
+                {recentChallans.slice(0, 5).map((c) => (
+                  <div className="mobile-data-card" key={c.id}>
+                    <div className="mobile-data-card-header" style={{ marginBottom: '8px' }}>
+                      <Link to={`/admin/challans/${c.id}`} className="mobile-data-card-title" style={{ fontFamily: 'monospace', textDecoration: 'none', color: 'var(--primary)' }}>
+                        {c.challanNo}
+                      </Link>
+                      <span className={`badge badge-${c.status.toLowerCase()}`}>{c.status}</span>
+                    </div>
+                    <div className="mobile-data-card-grid" style={{ marginTop: '0' }}>
+                      <div>
+                        <div className="mobile-data-card-label">Customer</div>
+                        <div className="mobile-data-card-value">{c.customer?.name}</div>
+                      </div>
+                      <div>
+                        <div className="mobile-data-card-label">Amount</div>
+                        <div className="mobile-data-card-value">₹{c.totalAmount.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="mobile-data-card-label">Date</div>
+                        <div className="mobile-data-card-value">{new Date(c.createdAt).toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
